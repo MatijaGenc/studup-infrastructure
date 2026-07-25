@@ -1,0 +1,4 @@
+# Get actual values from AWS Secrets Manager or environment
+# db_password     = ""
+# jwt_secret      = ""
+# email_api_key   = ""
