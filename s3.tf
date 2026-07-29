@@ -30,7 +30,7 @@ resource "aws_s3_bucket_website_configuration" "website" {
 }
 
 resource "aws_s3_bucket_public_access_block" "website" {
-  bucket = aws_s3_bucket.website.id
+  bucket                  = aws_s3_bucket.website.id
   block_public_acls       = false
   ignore_public_acls      = false
   block_public_policy     = false
@@ -70,7 +70,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "profile_images" {
 }
 
 resource "aws_s3_bucket_public_access_block" "profile_images" {
-  bucket = aws_s3_bucket.profile_images.id
+  bucket                  = aws_s3_bucket.profile_images.id
   block_public_acls       = false
   ignore_public_acls      = false
   block_public_policy     = false
@@ -87,4 +87,22 @@ resource "aws_s3_bucket_lifecycle_configuration" "profile_images" {
       noncurrent_days = 30
     }
   }
+}
+
+resource "aws_s3_bucket_policy" "profile_images_cloudfront" {
+  bucket = aws_s3_bucket.profile_images.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudFrontOAI"
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_cloudfront_origin_access_identity.profile_images.iam_arn
+        }
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.profile_images.arn}/*"
+      }
+    ]
+  })
 }
