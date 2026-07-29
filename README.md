@@ -14,9 +14,11 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 | **RDS** | PostgreSQL `dev` (db.t3.micro) | eu-south-1 |
 | **Route53** | `studup.net` hosted zone | - |
 | **ACM** | `*.studup.net` + `www.studup.net` certs | eu-south-1 / us-east-1 |
-| **WAF** | Rate limiting (100 req/5min per IP) | eu-south-1 |
+| **WAF** | Rate limiting (100 req/5min per IP) + CloudFront WAF (AWS managed rules) | eu-south-1 / us-east-1 |
 | **Secrets Manager** | DB password, JWT secret, email API key | eu-south-1 |
-| **VPC** | Default VPC + `lambda-rds-sg` security group | eu-south-1 |
+| **VPC** | Default VPC + `lambda-rds-sg` security group + S3 Gateway Endpoint | eu-south-1 |
+| **Budgets** | Monthly cost budget with email alerts | us-east-1 |
+| **IAM** | Lambda role + S3 profile images policy | eu-south-1 |
 
 ## Prerequisites
 
@@ -69,6 +71,7 @@ studup-infrastructure/
 ├── acm.tf                # SSL/TLS certificates
 ├── waf.tf                # Web ACL + associations
 ├── secrets-manager.tf    # Secrets
+├── budget.tf             # Monthly cost budget + email alerts
 ├── outputs.tf            # Output values
 ├── import.sh             # Script to import existing resources
 └── terraform.tfvars.example  # Variable template

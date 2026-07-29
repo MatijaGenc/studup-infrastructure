@@ -21,3 +21,8 @@ data "aws_subnet" "default" {
 locals {
   subnet_ids = [for s in data.aws_subnet.default : s.id]
 }
+
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id       = data.aws_vpc.default.id
+  service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}

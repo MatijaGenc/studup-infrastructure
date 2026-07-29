@@ -9,10 +9,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "studup-terraform-state"
-    key            = "terraform.tfstate"
-    region         = "eu-south-1"
-    encrypt        = true
+    bucket  = "studup-terraform-state"
+    key     = "terraform.tfstate"
+    region  = "eu-south-1"
+    encrypt = true
   }
 }
 

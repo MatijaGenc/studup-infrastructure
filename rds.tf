@@ -5,11 +5,11 @@ resource "aws_db_subnet_group" "default" {
 }
 
 resource "aws_db_instance" "dev" {
-  identifier     = "dev"
-  engine         = "postgres"
-  instance_class = var.db_instance_class
+  identifier        = "dev"
+  engine            = "postgres"
+  instance_class    = var.db_instance_class
   allocated_storage = var.db_allocated_storage
-  storage_type   = "gp2"
+  storage_type      = "gp2"
   storage_encrypted = true
 
   username = "postgres"
@@ -19,14 +19,14 @@ resource "aws_db_instance" "dev" {
   vpc_security_group_ids = [aws_security_group.lambda_rds.id]
 
   publicly_accessible = false
-  multi_az            = false
+  multi_az            = true
   skip_final_snapshot = true
 
-  backup_retention_period = 0
-  backup_window           = "05:46-06:16"
-  deletion_protection     = true
+  backup_retention_period    = 30
+  backup_window              = "05:46-06:16"
+  deletion_protection        = true
   auto_minor_version_upgrade = false
-  max_allocated_storage   = 1000
+  max_allocated_storage      = 1000
 
   lifecycle {
     ignore_changes = [
