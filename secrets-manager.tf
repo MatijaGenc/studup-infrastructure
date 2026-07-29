@@ -3,15 +3,6 @@ resource "aws_secretsmanager_secret" "database_password" {
   description = "StudUp RDS PostgreSQL password"
 }
 
-# TODO: Add rotation Lambda + aws_secretsmanager_secret_rotation resource:
-# resource "aws_secretsmanager_secret_rotation" "db_password" {
-#   secret_id           = aws_secretsmanager_secret.database_password.id
-#   rotation_lambda_arn = aws_lambda_function.secret_rotation.arn
-#   rotation_rules {
-#     automatically_after_days = 30
-#   }
-# }
-
 resource "aws_secretsmanager_secret_version" "database_password" {
   secret_id     = aws_secretsmanager_secret.database_password.id
   secret_string = var.db_password
