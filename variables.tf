@@ -16,6 +16,20 @@ variable "email_api_key" {
   sensitive   = true
 }
 
+variable "vapid_public_key" {
+  description = "Web Push VAPID public key"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
+variable "vapid_private_key" {
+  description = "Web Push VAPID private key"
+  type        = string
+  sensitive   = true
+  default     = ""
+}
+
 variable "email_from_address" {
   description = "From email address"
   type        = string
