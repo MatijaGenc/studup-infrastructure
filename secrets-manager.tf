@@ -3,6 +3,15 @@ resource "aws_secretsmanager_secret" "database_password" {
   description = "StudUp RDS PostgreSQL password"
 }
 
+# TODO: Add rotation Lambda + aws_secretsmanager_secret_rotation resource:
+# resource "aws_secretsmanager_secret_rotation" "db_password" {
+#   secret_id           = aws_secretsmanager_secret.database_password.id
+#   rotation_lambda_arn = aws_lambda_function.secret_rotation.arn
+#   rotation_rules {
+#     automatically_after_days = 30
+#   }
+# }
+
 resource "aws_secretsmanager_secret_version" "database_password" {
   secret_id     = aws_secretsmanager_secret.database_password.id
   secret_string = var.db_password
@@ -34,6 +43,34 @@ resource "aws_secretsmanager_secret" "email_api_key" {
 resource "aws_secretsmanager_secret_version" "email_api_key" {
   secret_id     = aws_secretsmanager_secret.email_api_key.id
   secret_string = var.email_api_key
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "vapid_public_key" {
+  name        = "studup-vapid-public-key"
+  description = "StudUp Web Push VAPID public key"
+}
+
+resource "aws_secretsmanager_secret_version" "vapid_public_key" {
+  secret_id     = aws_secretsmanager_secret.vapid_public_key.id
+  secret_string = var.vapid_public_key
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "vapid_private_key" {
+  name        = "studup-vapid-private-key"
+  description = "StudUp Web Push VAPID private key"
+}
+
+resource "aws_secretsmanager_secret_version" "vapid_private_key" {
+  secret_id     = aws_secretsmanager_secret.vapid_private_key.id
+  secret_string = var.vapid_private_key
 
   lifecycle {
     ignore_changes = [secret_string]
