@@ -35,9 +35,9 @@ resource "aws_wafv2_web_acl" "rate_limit" {
 }
 
 locals {
-  open_api_stage_arn = "arn:aws:apigateway:${data.aws_region.current.name}::/restapis/${aws_api_gateway_rest_api.open_api.id}/stages/${aws_api_gateway_stage.open_api.stage_name}"
-  dta_api_stage_arn  = "arn:aws:apigateway:${data.aws_region.current.name}::/restapis/${aws_api_gateway_rest_api.dta_api.id}/stages/${aws_api_gateway_stage.dta_api.stage_name}"
-  data_api_stage_arn = "arn:aws:apigateway:${data.aws_region.current.name}::/restapis/${aws_api_gateway_rest_api.data_api.id}/stages/${aws_api_gateway_stage.data_api.stage_name}"
+  open_api_stage_arn = "arn:aws:apigateway:${data.aws_region.current.region}::/restapis/${aws_api_gateway_rest_api.open_api.id}/stages/${aws_api_gateway_stage.open_api.stage_name}"
+  dta_api_stage_arn  = "arn:aws:apigateway:${data.aws_region.current.region}::/restapis/${aws_api_gateway_rest_api.dta_api.id}/stages/${aws_api_gateway_stage.dta_api.stage_name}"
+  data_api_stage_arn = "arn:aws:apigateway:${data.aws_region.current.region}::/restapis/${aws_api_gateway_rest_api.data_api.id}/stages/${aws_api_gateway_stage.data_api.stage_name}"
 }
 
 resource "aws_wafv2_web_acl_association" "open_api" {
