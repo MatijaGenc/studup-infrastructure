@@ -9,12 +9,12 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 | **S3** | `studup-website` (frontend hosting) | eu-south-1 |
 | **S3** | `stud-up-profile-images` (user images) | eu-south-1 |
 | **CloudFront** | CDN for `www.studup.net` | us-east-1 |
-| **Lambda** | `DataHandler` (Node.js 24) | eu-south-1 |
+| **Lambda** | `DataHandler` (Node.js 22) | eu-south-1 |
 | **API Gateway** | `dta-api-new`, `data-api`, `open-api-API` | eu-south-1 |
 | **RDS** | PostgreSQL `dev` (db.t3.micro) | eu-south-1 |
 | **Route53** | `studup.net` hosted zone | - |
 | **ACM** | `*.studup.net` + `www.studup.net` certs | eu-south-1 / us-east-1 |
-| **WAF** | Rate limiting (100 req/5min per IP) + CloudFront WAF (AWS managed rules) | eu-south-1 / us-east-1 |
+| **WAF** | Rate limiting (100 req/5min per IP) on all 3 API Gateways + CloudFront WAF (AWS managed rules: common, SQLi, XSS) | eu-south-1 / us-east-1 |
 | **Secrets Manager** | DB password, JWT secret, email API key | eu-south-1 |
 | **VPC** | Default VPC + `lambda-rds-sg` security group + S3 Gateway Endpoint | eu-south-1 |
 | **Budgets** | Monthly cost budget with email alerts | us-east-1 |
