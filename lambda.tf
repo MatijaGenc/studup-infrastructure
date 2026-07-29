@@ -70,7 +70,7 @@ resource "aws_lambda_function" "data_handler" {
   function_name = "DataHandler"
   role          = aws_iam_role.lambda.arn
   handler       = "index.handler"
-  runtime       = "nodejs22.x"
+  runtime       = "nodejs22.x" # actual deployed runtime is nodejs24.x (managed outside Terraform)
   memory_size   = var.lambda_memory_size
   timeout       = var.lambda_timeout
   s3_bucket     = "studup-terraform-state"
@@ -97,10 +97,6 @@ resource "aws_lambda_function" "data_handler" {
       s3_key,
       s3_bucket,
       environment,
-      last_modified,
-      source_code_size,
-      source_code_hash,
-      version,
     ]
   }
 }

@@ -9,7 +9,7 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 | **S3** | `studup-website` (frontend hosting) | eu-south-1 |
 | **S3** | `stud-up-profile-images` (user images) | eu-south-1 |
 | **CloudFront** | CDN for `www.studup.net` | us-east-1 |
-| **Lambda** | `DataHandler` (Node.js 22) | eu-south-1 |
+| **Lambda** | `DataHandler` (Node.js 24) | eu-south-1 |
 | **API Gateway** | `dta-api-new`, `data-api`, `open-api-API` | eu-south-1 |
 | **RDS** | PostgreSQL `dev` (db.t3.micro) | eu-south-1 |
 | **Route53** | `studup.net` hosted zone | - |
