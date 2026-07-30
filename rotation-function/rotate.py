@@ -5,11 +5,17 @@ import string
 
 import boto3
 import pg8000
+from pg8000.native import literal
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 secrets_client = boto3.client("secretsmanager")
+
+DB_HOST = "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com"
+DB_PORT = 5432
+DB_USER = "postgres"
+DB_NAME = "postgres"
 
 
 def generate_password(length=32):
@@ -24,13 +30,13 @@ def generate_password(length=32):
             return password
 
 
-def get_connection(secret):
+def get_connection(password):
     return pg8000.connect(
-        host=secret["host"],
-        port=secret.get("port", 5432),
-        user=secret["username"],
-        password=secret["password"],
-        database=secret.get("dbname", "postgres"),
+        host=DB_HOST,
+        port=DB_PORT,
+        user=DB_USER,
+        password=password,
+        database=DB_NAME,
     )
 
 
@@ -43,13 +49,13 @@ def lambda_handler(event, context):
     if not metadata["RotationEnabled"]:
         raise ValueError(f"Secret {arn} is not enabled for rotation")
 
-    version_ids = metadata["VersionIdsToStages"]
+    version_ids = list(metadata["VersionIdsToStages"].keys())
     if token not in version_ids:
         raise ValueError(
             f"Rotation token {token} not found in secret {arn}"
         )
 
-    if metadata["VersionIdToStages"].get(token, []) == ["AWSCURRENT"]:
+    if metadata["VersionIdsToStages"].get(token, []) == ["AWSCURRENT"]:
         logger.info("Secret %s is already set to AWSCURRENT", arn)
         return
 
@@ -65,6 +71,13 @@ def lambda_handler(event, context):
         raise ValueError(f"Invalid step {step}")
 
 
+def _get_current_password(arn):
+    response = secrets_client.get_secret_value(
+        SecretId=arn, VersionStage="AWSCURRENT"
+    )
+    return response["SecretString"]
+
+
 def _create_secret(arn, token):
     try:
         secrets_client.get_secret_value(
@@ -75,47 +88,37 @@ def _create_secret(arn, token):
     except secrets_client.exceptions.ResourceNotFoundException:
         pass
 
-    current = json.loads(
-        secrets_client.get_secret_value(
-            SecretId=arn, VersionStage="AWSCURRENT"
-        )["SecretString"]
-    )
-
-    current["password"] = generate_password()
+    new_password = generate_password()
 
     secrets_client.put_secret_value(
         SecretId=arn,
         ClientRequestToken=token,
-        VersionStage="AWSPENDING",
-        SecretString=json.dumps(current),
+        VersionStages=["AWSPENDING"],
+        SecretString=new_password,
     )
     logger.info("createSecret: AWSPENDING version %s created", token)
 
 
 def _set_secret(arn, token):
-    pending = json.loads(
-        secrets_client.get_secret_value(
-            SecretId=arn, VersionId=token, VersionStage="AWSPENDING"
-        )["SecretString"]
-    )
+    current = _get_current_password(arn)
+    pending = secrets_client.get_secret_value(
+        SecretId=arn, VersionId=token, VersionStage="AWSPENDING"
+    )["SecretString"]
 
-    conn = get_connection(pending)
+    conn = get_connection(current)
     with conn.cursor() as cur:
         cur.execute(
-            "ALTER USER " + pending["username"] + " WITH PASSWORD %s",
-            (pending["password"],),
+            "ALTER USER " + DB_USER + " WITH PASSWORD " + literal(pending)
         )
     conn.commit()
     conn.close()
-    logger.info("setSecret: password updated for user %s", pending["username"])
+    logger.info("setSecret: password updated for user %s", DB_USER)
 
 
 def _test_secret(arn, token):
-    pending = json.loads(
-        secrets_client.get_secret_value(
-            SecretId=arn, VersionId=token, VersionStage="AWSPENDING"
-        )["SecretString"]
-    )
+    pending = secrets_client.get_secret_value(
+        SecretId=arn, VersionId=token, VersionStage="AWSPENDING"
+    )["SecretString"]
 
     conn = get_connection(pending)
     conn.close()

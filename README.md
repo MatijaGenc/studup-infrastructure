@@ -10,15 +10,91 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 | **S3** | `stud-up-profile-images` (user images) | eu-south-1 |
 | **CloudFront** | CDN for `www.studup.net` | us-east-1 |
 | **Lambda** | `DataHandler` (Node.js 24) | eu-south-1 |
+| **Lambda** | `studup-db-password-rotation` (Python 3.12) | eu-south-1 |
 | **API Gateway** | `dta-api-new`, `data-api`, `open-api-API` | eu-south-1 |
-| **RDS** | PostgreSQL `dev` (db.t3.micro) | eu-south-1 |
+| **RDS** | PostgreSQL `dev` (db.t3.micro, Multi-AZ, backups 30d) | eu-south-1 |
 | **Route53** | `studup.net` hosted zone | - |
-| **ACM** | `*.studup.net` + `www.studup.net` certs | eu-south-1 / us-east-1 |
+| **ACM** | `*.studup.net` + `www.studup.net` + `studup.net` certs | eu-south-1 / us-east-1 |
 | **WAF** | Rate limiting (100 req/5min per IP) on all 3 API Gateways + CloudFront WAF (AWS managed rules: common, SQLi, XSS) | eu-south-1 / us-east-1 |
-| **Secrets Manager** | DB password, JWT secret, email API key | eu-south-1 |
-| **VPC** | Default VPC + `lambda-rds-sg` security group + S3 Gateway Endpoint | eu-south-1 |
-| **Budgets** | Monthly cost budget with email alerts | us-east-1 |
-| **IAM** | Lambda role + S3 profile images policy | eu-south-1 |
+| **Secrets Manager** | DB password, JWT secret, email API key, VAPID keys | eu-south-1 |
+| **Secrets Rotation** | DB password rotation every 30 days via Lambda | eu-south-1 |
+| **VPC** | Default VPC + `lambda-rds-sg` security group + S3 Gateway Endpoint + Postgres ingress rule | eu-south-1 |
+| **Budgets** | Monthly cost budget ($30) with email alerts at 80% and 100% | us-east-1 |
+| **IAM** | Lambda role + S3 profile images policy + rotation Lambda role | eu-south-1 |
+| **Monitoring** | SNS topic `studup-alarms` + CloudWatch alarms (API 5xx, Lambda errors, health check failure) | eu-south-1 |
+| **CloudWatch** | WAF logging + health check metric filter | eu-south-1 / us-east-1 |
+
+## What's Been Done (Sessions 2026-07-26 through 2026-07-30)
+
+### Infrastructure
+- **Terraform IaC**: All AWS resources codified and imported into state
+- **S3**: SSE-S3 encryption + versioning + lifecycle policies on both buckets
+- **CloudFront**: CDN with WAF (common rule set, SQLi, XSS), CSP/HSTS security headers, ordered cache behavior for `index.html`
+- **RDS**: Made private (no public access), Multi-AZ enabled, automated backups 30-day retention, encrypted
+- **ACM**: Renewed expired `studup.net` root cert, wildcard + www certs valid
+- **Route53**: All DNS records for custom domains
+- **WAF**: Regional rate-limit ACL (100 req/5min per IP) associated with all 3 API Gateways + CloudFront WAF with managed rules + rate limit
+- **Secrets Manager**: DB password, JWT secret, email API key, VAPID public/private keys — no plaintext in Lambda env vars
+- **Secrets Rotation**: Python 3.12 Lambda (`studup-db-password-rotation`) that rotates the DB password every 30 days via `pg8000` (createSecret → setSecret → testSecret → finishSecret)
+- **VPC**: S3 Gateway Endpoint for Lambda VPC access to S3, security group with proper ingress/egress rules
+- **Budget**: $30/month with email alerts at 80% and 100%
+- **Monitoring**: SNS topic + 3 CloudWatch alarms (API 5xx > 5 in 5min, Lambda errors > 3 in 5min, health check failure), health check metric filter
+
+### Backend (student-employer-backend)
+- Secrets moved from Lambda env vars to Secrets Manager (fetched at cold start)
+- JWT expiry reduced from 10 years to 15 min access + 7 day refresh tokens
+- Error handling: no stack traces leaked to clients, custom error classes, sanitized messages
+- Auth security: no user enumeration (generic error messages), rate limiting (in-app + WAF)
+- Audit logging: all actions logged to DB + Pino
+- Pagination + filters on job search (category, wage range, title text search, employer name, job type)
+- Job alert backend trigger: matches new jobs against alerts, sends push notifications
+- Push notification infrastructure: device token registration/unregistration, Expo Push API, web push (VAPID)
+- Rating system: full CRUD (create/edit/delete), student + employer ratings, average recalculation, pagination
+- Health check endpoint (pings DB, returns 200/503)
+- OpenAPI spec generated from Zod schemas
+- Fixes: StudentRating employer authorization, missing Prisma indexes, unique constraints, file upload validation (S3 + CloudFront)
+- Tests: 199/199 passing (integration + unit)
+
+### Frontend (student-employer-frontend)
+- CI/CD pipeline (GitHub Actions)
+- Code splitting (React.lazy): 71% reduction in initial bundle (1,324 kB → 379 kB)
+- Auth security: httpOnly cookies for refresh tokens, CSP meta tag, tokens in Zustand memory
+- Loading skeletons (shimmer animation) on all data-fetching components
+- React Hook Form + Zod migration for all 9 forms
+- Error boundary with Croatian fallback UI
+- API error handling: `makeRequest` helper with 2 retries + exponential backoff
+- Alert UI: create/edit/delete job alerts (max 3 per student)
+- Web push notifications: service worker, Push API subscription/unsubscription
+- Rate form UI: given/received ratings, edit/delete with confirmation
+- PWA support: service worker, manifest, offline fallback
+- Bug fixes: missing logo, empty category dropdown, logout state persistence
+- Tests: 24/24 passing
+
+### Mobile (student-employer-mobile)
+- CI/CD pipeline (GitHub Actions + EAS preview/production)
+- expo-secure-store for encrypted token storage
+- LogBox: removed `ignoreAllLogs()`, targeted suppression only
+- Rating system UI: given/received ratings, edit/delete
+- Push notification registration on login, unregistration on logout
+- Expo SDK upgraded to SDK 57
+- Typecheck: clean
+
+### Shared (studup-shared)
+- Zod validation schemas, enums, types extracted to standalone package
+- Imported by backend, frontend, and mobile — single source of truth
+- Password policy standardized: min 8, max 50, 1 upper, 1 lower, 1 number
+
+## What's Left (Unfinished / Future)
+
+### Optional (unchecked items from task list)
+- **CAPTCHA on registration** (S-008) — reCAPTCHA v3 or Turnstile for bot protection
+- **Sentry error tracking** (S-011 / S-024) — SKIPPED (no Sentry account)
+- **Lambda reserved concurrency** (S-018) — blocked by AWS account limit (10 concurrent execs)
+
+### Future / Monetization
+- **S-101**: Admin panel + statistics dashboard
+- **S-102**: Job posting monetization (pay-per-job, Stripe integration)
+- **S-103**: Billing & invoicing system (Croatian VAT invoices)
 
 ## Prerequisites
 
@@ -63,14 +139,21 @@ studup-infrastructure/
 ├── variables.tf          # Input variables
 ├── data.tf               # Data sources (VPC, subnets)
 ├── s3.tf                 # S3 buckets + versioning + encryption
-├── cloudfront.tf         # CloudFront distribution
-├── lambda.tf             # Lambda function + IAM role + SG
+├── cloudfront.tf         # CloudFront distribution + CSP headers
+├── lambda.tf             # DataHandler Lambda + IAM role + SG
+├── rotation-lambda.tf    # DB password rotation Lambda + IAM role
+├── rotation-function/    # Rotation Lambda source code (Python)
+│   ├── rotate.py
+│   ├── build.sh
+│   └── requirements.txt
+├── rotation-function.zip # Pre-built rotation Lambda package
 ├── api-gateway.tf        # 3 REST APIs + custom domains
-├── rds.tf                # PostgreSQL database
+├── rds.tf                # PostgreSQL database (Multi-AZ)
 ├── route53.tf            # DNS zone + records
 ├── acm.tf                # SSL/TLS certificates
 ├── waf.tf                # Web ACL + associations
-├── secrets-manager.tf    # Secrets
+├── secrets-manager.tf    # Secrets + VAPID keys
+├── monitoring.tf         # SNS alarms + CloudWatch metric filters
 ├── budget.tf             # Monthly cost budget + email alerts
 ├── outputs.tf            # Output values
 ├── import.sh             # Script to import existing resources
