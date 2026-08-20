@@ -24,23 +24,69 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 | **Monitoring** | SNS topic `studup-alarms` + CloudWatch alarms (API 5xx, Lambda errors, health check failure) | eu-south-1 |
 | **CloudWatch** | WAF logging + health check metric filter | eu-south-1 / us-east-1 |
 
-## What's Been Done (Sessions 2026-07-26 through 2026-07-30)
+## What's Been Done (Sessions through 2026-08-20)
 
-### Infrastructure
-- **Terraform IaC**: All AWS resources codified and imported into state
-- **S3**: SSE-S3 encryption + versioning + lifecycle policies on both buckets
-- **CloudFront**: CDN with WAF (common rule set, SQLi, XSS), CSP/HSTS security headers, ordered cache behavior for `index.html`
-- **RDS**: Made private (no public access), Multi-AZ enabled, automated backups 30-day retention, encrypted
-- **ACM**: Renewed expired `studup.net` root cert, wildcard + www certs valid
-- **Route53**: All DNS records for custom domains
-- **WAF**: Regional rate-limit ACL (100 req/5min per IP) associated with all 3 API Gateways + CloudFront WAF with managed rules + rate limit
-- **Secrets Manager**: DB password, JWT secret, email API key, VAPID public/private keys — no plaintext in Lambda env vars
-- **Secrets Rotation**: Python 3.12 Lambda (`studup-db-password-rotation`) that rotates the DB password every 30 days via `pg8000` (createSecret → setSecret → testSecret → finishSecret)
-- **VPC**: S3 Gateway Endpoint for Lambda VPC access to S3, security group with proper ingress/egress rules
-- **Budget**: $30/month with email alerts at 80% and 100%
-- **Monitoring**: SNS topic + 3 CloudWatch alarms (API 5xx > 5 in 5min, Lambda errors > 3 in 5min, health check failure), health check metric filter
+### A-018: Fix SSL Certificate Validation in Terraform
+- Added DNS validation Route53 records + `aws_acm_certificate_validation` resources for all 3 ACM certs:
+  - `*.studup.net` (eu-south-1) — was missing entirely
+  - `studup.net` (eu-south-1) — already present
+  - `www.studup.net` (us-east-1) — was missing entirely
+- API Gateway domain names updated to reference validated cert ARNs via `aws_acm_certificate_validation.studup_wildcard.certificate_arn`
+- CloudFront updated to reference validated cert ARNs via `aws_acm_certificate_validation.www_studup.certificate_arn`
+
+### Cross-Project Fixes
+- **@studup/shared alignment**: All 3 projects (backend, frontend, mobile) now pinned to the same commit `99450a3`
+- **Biome 2.5.9**: All 3 projects updated to use Biome 2.5.9 (was mixed 2.5.6/2.5.9)
+- **CI SSH auth fix**: `github:` shorthand deps now resolve via HTTPS in CI instead of SSH
+
+### Frontend (student-employer-frontend)
+- **Build warnings**: Fixed font/image path resolution (root-relative `/resources/` paths), `chunkSizeWarningLimit` raised
+- **Zustand**: Migrated from deprecated `create` to `createWithEqualityFn`
+- **React Router**: Added `v7_startTransition` + `v7_relativeSplatPath` future flags to `BrowserRouter` + all `MemoryRouter` instances in tests
+- **@mui/x-date-pickers**: Upgraded from `^6.4.0` to `^7.23.0` for React 19 compatibility
+- **Peer deps**: Added explicit `@mui/system`, `prop-types`, `clsx` to satisfy peer dependencies
+- **@studup/shared**: Regenerated `yarn.lock` so `github:` shorthand resolves via HTTPS
+- **Tests**: 24/24 passing — zero warnings in stderr
 
 ### Backend (student-employer-backend)
+- **Biome**: Fixed `package.json` formatting in lint-staged config
+- **@studup/shared**: Pinned to full commit hash with HTTPS git dependency
+- **Lambda deploy**: Fixed race condition — `wait function-updated` between `update-function-code` and `update-function-configuration`, skips runtime update if already correct
+- **Prisma**: Attempted upgrade 5.22.0 → 7.9.1, but reverted (Prisma 7 requires `prisma.config.ts` and drops `url` from `schema.prisma` — planned for future task S-044)
+
+### Mobile (student-employer-mobile)
+- **Biome**: Fixed `package.json` formatting in lint-staged config
+- **@studup/shared**: Pinned to full commit hash
+
+## What's NOT Been Done / Known Issues
+
+### Infrastructure (terraform plan NOT verified)
+The cert validation changes in `acm.tf` were committed but `terraform plan` could **not** be run because AWS CLI authentication is broken. The `aws login` command opens a browser flow but the OAuth grant consistently fails with:
+```
+The provided authorization grant is invalid, expired, revoked, or malformed
+```
+
+**To fix**: Run `terraform plan` manually after reauthenticating via:
+```bash
+aws sso login
+# or
+aws configure  # with IAM access keys
+cd ~/Projects/studup-infrastructure
+terraform plan
+```
+
+### Prisma 7 Upgrade (S-044)
+Blocked on breaking changes in Prisma 7 — it requires a `prisma.config.ts` file and removes `url` from `schema.prisma`. Needs a separate migration task.
+
+### Punycode Deprecation Warnings
+Node 26 deprecates the built-in `punycode` module. Transitive deps (`psl`, `uri-js`) still use it. These appear during tests as non-blocking stderr. Fix requires upstream package updates or `NODE_OPTIONS='--no-deprecation'`.
+
+### Remaining
+- **CAPTCHA on registration** (S-008) — optional
+- **Sentry error tracking** (S-024) — SKIPPED (no Sentry account)
+- **Lambda reserved concurrency** (S-018) — blocked by AWS account limit (10 concurrent execs)
+
+### Backend (student-employer-backend) — Previous Sessions
 - Secrets moved from Lambda env vars to Secrets Manager (fetched at cold start)
 - JWT expiry reduced from 10 years to 15 min access + 7 day refresh tokens
 - Error handling: no stack traces leaked to clients, custom error classes, sanitized messages
@@ -55,7 +101,7 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 - Fixes: StudentRating employer authorization, missing Prisma indexes, unique constraints, file upload validation (S3 + CloudFront)
 - Tests: 199/199 passing (integration + unit)
 
-### Frontend (student-employer-frontend)
+### Frontend (student-employer-frontend) — Previous Sessions
 - CI/CD pipeline (GitHub Actions)
 - Code splitting (React.lazy): 71% reduction in initial bundle (1,324 kB → 379 kB)
 - Auth security: httpOnly cookies for refresh tokens, CSP meta tag, tokens in Zustand memory
@@ -70,7 +116,7 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 - Bug fixes: missing logo, empty category dropdown, logout state persistence
 - Tests: 24/24 passing
 
-### Mobile (student-employer-mobile)
+### Mobile (student-employer-mobile) — Previous Sessions
 - CI/CD pipeline (GitHub Actions + EAS preview/production)
 - expo-secure-store for encrypted token storage
 - LogBox: removed `ignoreAllLogs()`, targeted suppression only
@@ -79,24 +125,27 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 - Expo SDK upgraded to SDK 57
 - Typecheck: clean
 
-### Shared (studup-shared)
+### Shared (studup-shared) — Previous Sessions
 - Zod validation schemas, enums, types extracted to standalone package
 - Imported by backend, frontend, and mobile — single source of truth
 - Password policy standardized: min 8, max 50, 1 upper, 1 lower, 1 number
 
-## What's Left (Unfinished / Future)
+## What's NOT Been Done / Known Issues
 
-### Optional (unchecked items from task list)
-- **CAPTCHA on registration** (S-008) — reCAPTCHA v3 or Turnstile for bot protection
-- **Sentry error tracking** (S-011 / S-024) — SKIPPED (no Sentry account)
-- **Lambda reserved concurrency** (S-018) — blocked by AWS account limit (10 concurrent execs)
+### Infrastructure (terraform plan NOT verified)
+The cert validation changes in `acm.tf` were committed but `terraform plan` could **not** be run because AWS CLI authentication is broken. The `aws login` command opens a browser flow but the OAuth grant consistently fails with:
+```
+The provided authorization grant is invalid, expired, revoked, or malformed
+```
 
-### Future / Monetization
-- **S-101**: Admin panel + statistics dashboard
-- **S-102**: Job posting monetization (pay-per-job, Stripe integration)
-- **S-103**: Billing & invoicing system (Croatian VAT invoices)
-
-## Prerequisites
+**To fix**: Run `terraform plan` manually after reauthenticating via:
+```bash
+aws sso login
+# or
+aws configure  # with IAM access keys
+cd ~/Projects/studup-infrastructure
+terraform plan
+```
 
 - [Terraform](https://developer.hashicorp.com/terraform/install) >= 1.6
 - AWS CLI configured with credentials for account `672791741750`
