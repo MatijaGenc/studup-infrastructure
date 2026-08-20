@@ -157,9 +157,8 @@ terraform plan
 # 1. Export AWS credentials (SSO)
 eval $(aws configure export-credentials --format env)
 
-# 2. Create terraform.tfvars from example
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with actual secret values
+# 2. Load secrets from AWS Secrets Manager
+source ./scripts/load-secrets.sh
 
 # 3. Initialize (state stored in S3)
 terraform init
