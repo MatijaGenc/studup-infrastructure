@@ -186,7 +186,7 @@ resource "aws_api_gateway_stage" "open_api" {
 
 resource "aws_api_gateway_domain_name" "openapi" {
   domain_name              = "openapi.studup.net"
-  regional_certificate_arn = aws_acm_certificate.studup_wildcard.arn
+  regional_certificate_arn = aws_acm_certificate_validation.studup_wildcard.certificate_arn
   endpoint_configuration {
     types = ["REGIONAL"]
   }
@@ -200,7 +200,7 @@ resource "aws_api_gateway_base_path_mapping" "openapi" {
 
 resource "aws_api_gateway_domain_name" "userapi" {
   domain_name              = "userapi.studup.net"
-  regional_certificate_arn = aws_acm_certificate.studup_wildcard.arn
+  regional_certificate_arn = aws_acm_certificate_validation.studup_wildcard.certificate_arn
   endpoint_configuration {
     types = ["REGIONAL"]
   }
