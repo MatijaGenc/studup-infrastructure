@@ -1,4 +1,23 @@
-# Get actual values from AWS Secrets Manager or environment
+# Get actual values from environment variables (TF_VAR_db_password, etc.)
+#
+# Before running terraform plan/apply, export secrets from AWS Secrets Manager:
+#
+#   source ./scripts/load-secrets.sh
+#
+# Or manually:
+#
+#   export TF_VAR_db_password=$(aws secretsmanager get-secret-value \
+#     --secret-id studup-database-password --query SecretString --output text)
+#   export TF_VAR_jwt_secret=$(aws secretsmanager get-secret-value \
+#     --secret-id studup-jwt-secret --query SecretString --output text)
+#   export TF_VAR_email_api_key=$(aws secretsmanager get-secret-value \
+#     --secret-id studup-email-api-key --query SecretString --output text)
+#   export TF_VAR_vapid_public_key=$(aws secretsmanager get-secret-value \
+#     --secret-id studup-vapid-public-key --query SecretString --output text)
+#   export TF_VAR_vapid_private_key=$(aws secretsmanager get-secret-value \
+#     --secret-id studup-vapid-private-key --query SecretString --output text)
+#
+# Non-sensitive variables can go directly here:
 # db_password        = ""
 # jwt_secret         = ""
 # email_api_key      = ""
