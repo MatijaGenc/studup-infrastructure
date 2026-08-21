@@ -11,6 +11,12 @@ resource "aws_api_gateway_resource" "dta_api_data" {
   path_part   = "data"
 }
 
+resource "aws_api_gateway_resource" "dta_api_proxy" {
+  rest_api_id = aws_api_gateway_rest_api.dta_api.id
+  parent_id   = aws_api_gateway_rest_api.dta_api.root_resource_id
+  path_part   = "{proxy+}"
+}
+
 resource "aws_api_gateway_method" "dta_api_any_root" {
   rest_api_id   = aws_api_gateway_rest_api.dta_api.id
   resource_id   = aws_api_gateway_rest_api.dta_api.root_resource_id
@@ -21,6 +27,13 @@ resource "aws_api_gateway_method" "dta_api_any_root" {
 resource "aws_api_gateway_method" "dta_api_any_data" {
   rest_api_id   = aws_api_gateway_rest_api.dta_api.id
   resource_id   = aws_api_gateway_resource.dta_api_data.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "dta_api_any_proxy" {
+  rest_api_id   = aws_api_gateway_rest_api.dta_api.id
+  resource_id   = aws_api_gateway_resource.dta_api_proxy.id
   http_method   = "ANY"
   authorization = "NONE"
 }
@@ -43,10 +56,20 @@ resource "aws_api_gateway_integration" "dta_api_any_data" {
   uri                     = aws_lambda_function.data_handler.invoke_arn
 }
 
+resource "aws_api_gateway_integration" "dta_api_any_proxy" {
+  rest_api_id             = aws_api_gateway_rest_api.dta_api.id
+  resource_id             = aws_api_gateway_resource.dta_api_proxy.id
+  http_method             = aws_api_gateway_method.dta_api_any_proxy.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.data_handler.invoke_arn
+}
+
 resource "aws_api_gateway_deployment" "dta_api" {
   depends_on = [
     aws_api_gateway_integration.dta_api_any_root,
     aws_api_gateway_integration.dta_api_any_data,
+    aws_api_gateway_integration.dta_api_any_proxy,
   ]
   rest_api_id = aws_api_gateway_rest_api.dta_api.id
   lifecycle {
@@ -73,6 +96,12 @@ resource "aws_api_gateway_resource" "data_api_data" {
   path_part   = "data-api"
 }
 
+resource "aws_api_gateway_resource" "data_api_proxy" {
+  rest_api_id = aws_api_gateway_rest_api.data_api.id
+  parent_id   = aws_api_gateway_rest_api.data_api.root_resource_id
+  path_part   = "{proxy+}"
+}
+
 resource "aws_api_gateway_method" "data_api_any_root" {
   rest_api_id   = aws_api_gateway_rest_api.data_api.id
   resource_id   = aws_api_gateway_rest_api.data_api.root_resource_id
@@ -83,6 +112,13 @@ resource "aws_api_gateway_method" "data_api_any_root" {
 resource "aws_api_gateway_method" "data_api_any_dataapi" {
   rest_api_id   = aws_api_gateway_rest_api.data_api.id
   resource_id   = aws_api_gateway_resource.data_api_data.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "data_api_any_proxy" {
+  rest_api_id   = aws_api_gateway_rest_api.data_api.id
+  resource_id   = aws_api_gateway_resource.data_api_proxy.id
   http_method   = "ANY"
   authorization = "NONE"
 }
@@ -105,10 +141,20 @@ resource "aws_api_gateway_integration" "data_api_any_dataapi" {
   uri                     = aws_lambda_function.data_handler.invoke_arn
 }
 
+resource "aws_api_gateway_integration" "data_api_any_proxy" {
+  rest_api_id             = aws_api_gateway_rest_api.data_api.id
+  resource_id             = aws_api_gateway_resource.data_api_proxy.id
+  http_method             = aws_api_gateway_method.data_api_any_proxy.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.data_handler.invoke_arn
+}
+
 resource "aws_api_gateway_deployment" "data_api" {
   depends_on = [
     aws_api_gateway_integration.data_api_any_root,
     aws_api_gateway_integration.data_api_any_dataapi,
+    aws_api_gateway_integration.data_api_any_proxy,
   ]
   rest_api_id = aws_api_gateway_rest_api.data_api.id
   lifecycle {
@@ -135,6 +181,12 @@ resource "aws_api_gateway_resource" "open_api_path" {
   path_part   = "open-api"
 }
 
+resource "aws_api_gateway_resource" "open_api_proxy" {
+  rest_api_id = aws_api_gateway_rest_api.open_api.id
+  parent_id   = aws_api_gateway_rest_api.open_api.root_resource_id
+  path_part   = "{proxy+}"
+}
+
 resource "aws_api_gateway_method" "open_api_any_root" {
   rest_api_id   = aws_api_gateway_rest_api.open_api.id
   resource_id   = aws_api_gateway_rest_api.open_api.root_resource_id
@@ -145,6 +197,13 @@ resource "aws_api_gateway_method" "open_api_any_root" {
 resource "aws_api_gateway_method" "open_api_any_path" {
   rest_api_id   = aws_api_gateway_rest_api.open_api.id
   resource_id   = aws_api_gateway_resource.open_api_path.id
+  http_method   = "ANY"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method" "open_api_any_proxy" {
+  rest_api_id   = aws_api_gateway_rest_api.open_api.id
+  resource_id   = aws_api_gateway_resource.open_api_proxy.id
   http_method   = "ANY"
   authorization = "NONE"
 }
@@ -167,10 +226,20 @@ resource "aws_api_gateway_integration" "open_api_any_path" {
   uri                     = aws_lambda_function.data_handler.invoke_arn
 }
 
+resource "aws_api_gateway_integration" "open_api_any_proxy" {
+  rest_api_id             = aws_api_gateway_rest_api.open_api.id
+  resource_id             = aws_api_gateway_resource.open_api_proxy.id
+  http_method             = aws_api_gateway_method.open_api_any_proxy.http_method
+  type                    = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri                     = aws_lambda_function.data_handler.invoke_arn
+}
+
 resource "aws_api_gateway_deployment" "open_api" {
   depends_on = [
     aws_api_gateway_integration.open_api_any_root,
     aws_api_gateway_integration.open_api_any_path,
+    aws_api_gateway_integration.open_api_any_proxy,
   ]
   rest_api_id = aws_api_gateway_rest_api.open_api.id
   lifecycle {
