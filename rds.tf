@@ -47,6 +47,7 @@ resource "aws_db_instance" "dev" {
       performance_insights_kms_key_id,
       performance_insights_retention_period,
       vpc_security_group_ids,
+      password,
     ]
   }
 

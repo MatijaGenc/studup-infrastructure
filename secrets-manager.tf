@@ -45,25 +45,7 @@ resource "aws_secretsmanager_secret" "vapid_public_key" {
   description = "StudUp Web Push VAPID public key"
 }
 
-resource "aws_secretsmanager_secret_version" "vapid_public_key" {
-  secret_id     = aws_secretsmanager_secret.vapid_public_key.id
-  secret_string = var.vapid_public_key
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
-}
-
 resource "aws_secretsmanager_secret" "vapid_private_key" {
   name        = "studup-vapid-private-key"
   description = "StudUp Web Push VAPID private key"
-}
-
-resource "aws_secretsmanager_secret_version" "vapid_private_key" {
-  secret_id     = aws_secretsmanager_secret.vapid_private_key.id
-  secret_string = var.vapid_private_key
-
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
 }
