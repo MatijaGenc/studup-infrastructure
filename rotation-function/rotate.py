@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import secrets
 import string
 
@@ -12,10 +13,10 @@ logger.setLevel(logging.INFO)
 
 secrets_client = boto3.client("secretsmanager")
 
-DB_HOST = "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com"
-DB_PORT = 5432
-DB_USER = "postgres"
-DB_NAME = "postgres"
+DB_HOST = os.environ.get("DB_HOST", "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com")
+DB_PORT = int(os.environ.get("DB_PORT", "5432"))
+DB_USER = os.environ.get("DB_USER", "postgres")
+DB_NAME = os.environ.get("DB_NAME", "postgres")
 
 
 def generate_password(length=32):

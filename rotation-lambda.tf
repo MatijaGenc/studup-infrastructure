@@ -65,6 +65,15 @@ resource "aws_lambda_function" "db_password_rotation" {
     security_group_ids = [aws_security_group.lambda_rds.id]
   }
 
+  environment {
+    variables = {
+      DB_HOST = aws_db_instance.dev.address
+      DB_PORT = tostring(aws_db_instance.dev.port)
+      DB_USER = aws_db_instance.dev.username
+      DB_NAME = "postgres"
+    }
+  }
+
   lifecycle {
     ignore_changes = [
       filename,

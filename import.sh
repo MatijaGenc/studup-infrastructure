@@ -42,7 +42,7 @@ terraform import aws_cloudfront_distribution.studup E3QIPLNGFSS6DH || echo "SKIP
 terraform import aws_lambda_function.data_handler DataHandler || echo "SKIP"
 
 # IAM Role (service-role path)
-terraform import aws_iam_role.lambda service-role/DataHandler-role-mptpqo4g || terraform import aws_iam_role.lambda DataHandler-role-mptpqo4g || echo "SKIP"
+terraform import aws_iam_role.lambda service-role/DataHandler-role-mptpq4o3 || echo "SKIP"
 
 # API Gateway (REST APIs)
 terraform import aws_api_gateway_rest_api.dta_api 9p1f5s3z65 || echo "SKIP"
