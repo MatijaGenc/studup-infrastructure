@@ -20,12 +20,13 @@ resource "aws_db_instance" "dev" {
 
   publicly_accessible = false
   multi_az            = true
-  skip_final_snapshot = true
+  skip_final_snapshot        = false
+  final_snapshot_identifier  = "studup-dev-final"
 
   backup_retention_period    = 30
   backup_window              = "05:46-06:16"
   deletion_protection        = true
-  auto_minor_version_upgrade = false
+  auto_minor_version_upgrade = true
   max_allocated_storage      = 1000
 
   lifecycle {

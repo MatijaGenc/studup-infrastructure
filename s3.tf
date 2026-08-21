@@ -71,10 +71,10 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "profile_images" {
 
 resource "aws_s3_bucket_public_access_block" "profile_images" {
   bucket                  = aws_s3_bucket.profile_images.id
-  block_public_acls       = false
-  ignore_public_acls      = false
+  block_public_acls       = true
+  ignore_public_acls      = true
   block_public_policy     = false
-  restrict_public_buckets = false
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "profile_images" {

@@ -1,7 +1,7 @@
 resource "aws_route53_zone" "studup" {
   name          = "studup.net"
   comment       = "HostedZone created by Route53 Registrar"
-  force_destroy = true
+  force_destroy = false
 }
 
 resource "aws_route53_record" "openapi" {
