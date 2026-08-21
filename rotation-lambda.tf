@@ -105,4 +105,10 @@ resource "aws_secretsmanager_secret_rotation" "db_password" {
   rotation_rules {
     automatically_after_days = 30
   }
+
+  lifecycle {
+    ignore_changes = [
+      secret_id,
+    ]
+  }
 }
