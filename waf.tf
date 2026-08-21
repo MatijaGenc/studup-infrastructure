@@ -161,3 +161,13 @@ resource "aws_wafv2_web_acl_logging_configuration" "cloudfront" {
   resource_arn            = aws_wafv2_web_acl.cloudfront.arn
   log_destination_configs = [aws_cloudwatch_log_group.waf_cloudfront.arn]
 }
+
+resource "aws_cloudwatch_log_group" "waf_regional" {
+  name              = "aws-waf-logs-studup-regional"
+  retention_in_days = 30
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "regional" {
+  resource_arn            = aws_wafv2_web_acl.rate_limit.arn
+  log_destination_configs = [aws_cloudwatch_log_group.waf_regional.arn]
+}
