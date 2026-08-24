@@ -29,7 +29,21 @@ resource "aws_route53_record" "userapi" {
 resource "aws_route53_record" "www" {
   zone_id = aws_route53_zone.studup.zone_id
   name    = "www.studup.net"
-  type    = "CNAME"
-  ttl     = 300
-  records = [aws_cloudfront_distribution.studup.domain_name]
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.studup.domain_name
+    zone_id                = aws_cloudfront_distribution.studup.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "root" {
+  zone_id = aws_route53_zone.studup.zone_id
+  name    = "studup.net"
+  type    = "A"
+  alias {
+    name                   = aws_cloudfront_distribution.root_redirect.domain_name
+    zone_id                = aws_cloudfront_distribution.root_redirect.hosted_zone_id
+    evaluate_target_health = false
+  }
 }

@@ -106,3 +106,23 @@ resource "aws_s3_bucket_policy" "profile_images_cloudfront" {
     ]
   })
 }
+
+resource "aws_s3_bucket" "root_redirect" {
+  bucket = "studup-root-redirect"
+}
+
+resource "aws_s3_bucket_public_access_block" "root_redirect" {
+  bucket                  = aws_s3_bucket.root_redirect.id
+  block_public_acls       = false
+  ignore_public_acls      = false
+  block_public_policy     = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_website_configuration" "root_redirect" {
+  bucket = aws_s3_bucket.root_redirect.id
+  redirect_all_requests_to {
+    host_name = "www.studup.net"
+    protocol  = "https"
+  }
+}

@@ -94,7 +94,7 @@ resource "aws_cloudfront_response_headers_policy" "csp" {
 
   security_headers_config {
     content_security_policy {
-      content_security_policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.studup.net; frame-src 'none'; object-src 'none'"
+      content_security_policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.studup.net https://studup.net; frame-src 'none'; object-src 'none'"
       override                = true
     }
 
@@ -124,5 +124,51 @@ resource "aws_cloudfront_response_headers_policy" "csp" {
       protection = true
       override   = true
     }
+  }
+}
+
+resource "aws_cloudfront_distribution" "root_redirect" {
+  enabled         = true
+  comment         = "Redirect studup.net to www.studup.net"
+  price_class     = "PriceClass_100"
+  http_version    = "http2"
+  is_ipv6_enabled = true
+
+  aliases = ["studup.net"]
+
+  origin {
+    domain_name = aws_s3_bucket_website_configuration.root_redirect.website_endpoint
+    origin_id   = "studup-root-redirect"
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  default_cache_behavior {
+    target_origin_id           = "studup-root-redirect"
+    viewer_protocol_policy     = "redirect-to-https"
+    allowed_methods            = ["GET", "HEAD"]
+    cached_methods             = ["GET", "HEAD"]
+    compress                   = true
+    cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+  }
+
+  viewer_certificate {
+    acm_certificate_arn      = aws_acm_certificate_validation.studup_root_cloudfront.certificate_arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+
+  tags = {
+    Name = "studup-root-redirect"
   }
 }
