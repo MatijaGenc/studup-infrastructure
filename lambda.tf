@@ -69,7 +69,7 @@ resource "aws_iam_role_policy_attachment" "s3_profile_images" {
 resource "aws_lambda_function" "data_handler" {
   function_name = "DataHandler"
   role          = aws_iam_role.lambda.arn
-  handler       = "index.handler"
+  handler       = "index.mjs.handler"
   runtime       = "nodejs24.x" # actual deployed: nodejs26.x (outdated provider enum, updated via CLI)
   memory_size   = var.lambda_memory_size
   timeout       = var.lambda_timeout
