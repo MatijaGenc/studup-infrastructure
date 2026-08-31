@@ -18,9 +18,23 @@ terraform {
 
 provider "aws" {
   region = "eu-south-1"
+
+  default_tags {
+    tags = {
+      Project     = "studup"
+      Environment = "production"
+    }
+  }
 }
 
 provider "aws" {
   alias  = "us-east-1"
   region = "us-east-1"
+
+  default_tags {
+    tags = {
+      Project     = "studup"
+      Environment = "production"
+    }
+  }
 }
