@@ -85,7 +85,7 @@ resource "aws_lambda_function" "data_handler" {
     variables = {
       APP_EMAIL_FROM_ADDRESS = var.email_from_address
       APP_SUPPORT_EMAIL      = var.support_email
-      APP_LOG_LEVEL          = "debug"
+      APP_LOG_LEVEL          = var.lambda_log_level
       CLOUDFRONT_DOMAIN      = aws_cloudfront_distribution.studup.domain_name
       PROFILE_IMAGES_BUCKET  = aws_s3_bucket.profile_images.id
     }
