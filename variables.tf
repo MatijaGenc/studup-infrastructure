@@ -71,3 +71,9 @@ variable "lambda_s3_key" {
   type        = string
   default     = "lambdas/DataHandler.zip"
 }
+
+variable "lambda_log_level" {
+  description = "Lambda log level (trace, debug, info, warn, error, fatal)"
+  type        = string
+  default     = "info"
+}
