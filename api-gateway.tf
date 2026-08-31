@@ -17,25 +17,37 @@ resource "aws_api_gateway_resource" "dta_api_proxy" {
   path_part   = "{proxy+}"
 }
 
+resource "aws_api_gateway_authorizer" "dta_api" {
+  name                   = "studup-jwt-authorizer"
+  rest_api_id            = aws_api_gateway_rest_api.dta_api.id
+  authorizer_uri         = aws_lambda_function.api_authorizer.invoke_arn
+  authorizer_credentials = aws_iam_role.api_authorizer.arn
+  type                   = "TOKEN"
+  identity_source        = "method.request.header.Authorization"
+}
+
 resource "aws_api_gateway_method" "dta_api_any_root" {
   rest_api_id   = aws_api_gateway_rest_api.dta_api.id
   resource_id   = aws_api_gateway_rest_api.dta_api.root_resource_id
   http_method   = "ANY"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.dta_api.id
 }
 
 resource "aws_api_gateway_method" "dta_api_any_data" {
   rest_api_id   = aws_api_gateway_rest_api.dta_api.id
   resource_id   = aws_api_gateway_resource.dta_api_data.id
   http_method   = "ANY"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.dta_api.id
 }
 
 resource "aws_api_gateway_method" "dta_api_any_proxy" {
   rest_api_id   = aws_api_gateway_rest_api.dta_api.id
   resource_id   = aws_api_gateway_resource.dta_api_proxy.id
   http_method   = "ANY"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.dta_api.id
 }
 
 resource "aws_api_gateway_integration" "dta_api_any_root" {
@@ -70,8 +82,20 @@ resource "aws_api_gateway_deployment" "dta_api" {
     aws_api_gateway_integration.dta_api_any_root,
     aws_api_gateway_integration.dta_api_any_data,
     aws_api_gateway_integration.dta_api_any_proxy,
+    aws_api_gateway_authorizer.dta_api,
   ]
   rest_api_id = aws_api_gateway_rest_api.dta_api.id
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_method.dta_api_any_root.id,
+      aws_api_gateway_method.dta_api_any_data.id,
+      aws_api_gateway_method.dta_api_any_proxy.id,
+      aws_api_gateway_integration.dta_api_any_root.id,
+      aws_api_gateway_integration.dta_api_any_data.id,
+      aws_api_gateway_integration.dta_api_any_proxy.id,
+      aws_api_gateway_authorizer.dta_api.id,
+    ]))
+  }
   lifecycle {
     create_before_destroy = true
   }
@@ -102,25 +126,37 @@ resource "aws_api_gateway_resource" "data_api_proxy" {
   path_part   = "{proxy+}"
 }
 
+resource "aws_api_gateway_authorizer" "data_api" {
+  name                   = "studup-jwt-authorizer"
+  rest_api_id            = aws_api_gateway_rest_api.data_api.id
+  authorizer_uri         = aws_lambda_function.api_authorizer.invoke_arn
+  authorizer_credentials = aws_iam_role.api_authorizer.arn
+  type                   = "TOKEN"
+  identity_source        = "method.request.header.Authorization"
+}
+
 resource "aws_api_gateway_method" "data_api_any_root" {
   rest_api_id   = aws_api_gateway_rest_api.data_api.id
   resource_id   = aws_api_gateway_rest_api.data_api.root_resource_id
   http_method   = "ANY"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.data_api.id
 }
 
 resource "aws_api_gateway_method" "data_api_any_dataapi" {
   rest_api_id   = aws_api_gateway_rest_api.data_api.id
   resource_id   = aws_api_gateway_resource.data_api_data.id
   http_method   = "ANY"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.data_api.id
 }
 
 resource "aws_api_gateway_method" "data_api_any_proxy" {
   rest_api_id   = aws_api_gateway_rest_api.data_api.id
   resource_id   = aws_api_gateway_resource.data_api_proxy.id
   http_method   = "ANY"
-  authorization = "NONE"
+  authorization = "CUSTOM"
+  authorizer_id = aws_api_gateway_authorizer.data_api.id
 }
 
 resource "aws_api_gateway_integration" "data_api_any_root" {
@@ -155,8 +191,20 @@ resource "aws_api_gateway_deployment" "data_api" {
     aws_api_gateway_integration.data_api_any_root,
     aws_api_gateway_integration.data_api_any_dataapi,
     aws_api_gateway_integration.data_api_any_proxy,
+    aws_api_gateway_authorizer.data_api,
   ]
   rest_api_id = aws_api_gateway_rest_api.data_api.id
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_method.data_api_any_root.id,
+      aws_api_gateway_method.data_api_any_dataapi.id,
+      aws_api_gateway_method.data_api_any_proxy.id,
+      aws_api_gateway_integration.data_api_any_root.id,
+      aws_api_gateway_integration.data_api_any_dataapi.id,
+      aws_api_gateway_integration.data_api_any_proxy.id,
+      aws_api_gateway_authorizer.data_api.id,
+    ]))
+  }
   lifecycle {
     create_before_destroy = true
   }
