@@ -72,6 +72,18 @@ resource "aws_api_gateway_deployment" "dta_api" {
     aws_api_gateway_integration.dta_api_any_proxy,
   ]
   rest_api_id = aws_api_gateway_rest_api.dta_api.id
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.dta_api_data.id,
+      aws_api_gateway_resource.dta_api_proxy.id,
+      aws_api_gateway_method.dta_api_any_root.id,
+      aws_api_gateway_method.dta_api_any_data.id,
+      aws_api_gateway_method.dta_api_any_proxy.id,
+      aws_api_gateway_integration.dta_api_any_root.id,
+      aws_api_gateway_integration.dta_api_any_data.id,
+      aws_api_gateway_integration.dta_api_any_proxy.id,
+    ]))
+  }
   lifecycle {
     create_before_destroy = true
   }
@@ -157,6 +169,18 @@ resource "aws_api_gateway_deployment" "data_api" {
     aws_api_gateway_integration.data_api_any_proxy,
   ]
   rest_api_id = aws_api_gateway_rest_api.data_api.id
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.data_api_data.id,
+      aws_api_gateway_resource.data_api_proxy.id,
+      aws_api_gateway_method.data_api_any_root.id,
+      aws_api_gateway_method.data_api_any_dataapi.id,
+      aws_api_gateway_method.data_api_any_proxy.id,
+      aws_api_gateway_integration.data_api_any_root.id,
+      aws_api_gateway_integration.data_api_any_dataapi.id,
+      aws_api_gateway_integration.data_api_any_proxy.id,
+    ]))
+  }
   lifecycle {
     create_before_destroy = true
   }
@@ -242,6 +266,18 @@ resource "aws_api_gateway_deployment" "open_api" {
     aws_api_gateway_integration.open_api_any_proxy,
   ]
   rest_api_id = aws_api_gateway_rest_api.open_api.id
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.open_api_path.id,
+      aws_api_gateway_resource.open_api_proxy.id,
+      aws_api_gateway_method.open_api_any_root.id,
+      aws_api_gateway_method.open_api_any_path.id,
+      aws_api_gateway_method.open_api_any_proxy.id,
+      aws_api_gateway_integration.open_api_any_root.id,
+      aws_api_gateway_integration.open_api_any_path.id,
+      aws_api_gateway_integration.open_api_any_proxy.id,
+    ]))
+  }
   lifecycle {
     create_before_destroy = true
   }
