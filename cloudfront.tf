@@ -1,7 +1,7 @@
 resource "aws_cloudfront_distribution" "studup" {
   enabled         = true
   comment         = ""
-  price_class     = "PriceClass_All"
+  price_class     = "PriceClass_100"
   http_version    = "http2"
   is_ipv6_enabled = true
   web_acl_id      = aws_wafv2_web_acl.cloudfront.arn
