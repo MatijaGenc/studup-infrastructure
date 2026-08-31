@@ -3,3 +3,4 @@
 .terraform.lock.hcl
 *.zip
 rotation-function/build/
+node_modules/authorizer/package-lock.json
