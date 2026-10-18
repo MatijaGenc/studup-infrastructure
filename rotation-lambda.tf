@@ -32,8 +32,8 @@ resource "aws_iam_policy" "rotation_secrets" {
         Resource = aws_secretsmanager_secret.database_password.arn
       },
       {
-        Effect = "Allow"
-        Action = "secretsmanager:GetRandomPassword"
+        Effect   = "Allow"
+        Action   = "secretsmanager:GetRandomPassword"
         Resource = "*"
       },
     ]
@@ -51,13 +51,13 @@ resource "aws_iam_role_policy_attachment" "rotation_vpc" {
 }
 
 resource "aws_lambda_function" "db_password_rotation" {
-  function_name = "studup-db-password-rotation"
-  role          = aws_iam_role.rotation_lambda.arn
-  runtime       = "python3.12"
-  handler       = "rotate.lambda_handler"
-  timeout       = 60
-  memory_size   = 128
-  filename      = "rotation-function.zip"
+  function_name    = "studup-db-password-rotation"
+  role             = aws_iam_role.rotation_lambda.arn
+  runtime          = "python3.12"
+  handler          = "rotate.lambda_handler"
+  timeout          = 60
+  memory_size      = 128
+  filename         = "rotation-function.zip"
   source_code_hash = filebase64sha256("rotation-function.zip")
 
   vpc_config {

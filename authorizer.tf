@@ -39,13 +39,13 @@ resource "aws_iam_role_policy_attachment" "api_authorizer_secrets" {
 }
 
 resource "aws_lambda_function" "api_authorizer" {
-  function_name = "studup-api-authorizer"
-  role          = aws_iam_role.api_authorizer.arn
-  handler       = "index.mjs.handler"
-  runtime       = "nodejs20.x"
-  memory_size   = 128
-  timeout       = 10
-  filename      = "authorizer.zip"
+  function_name    = "studup-api-authorizer"
+  role             = aws_iam_role.api_authorizer.arn
+  handler          = "index.mjs.handler"
+  runtime          = "nodejs20.x"
+  memory_size      = 128
+  timeout          = 10
+  filename         = "authorizer.zip"
   source_code_hash = filebase64sha256("authorizer.zip")
 }
 

@@ -328,3 +328,64 @@ resource "aws_api_gateway_base_path_mapping" "userapi" {
   stage_name  = aws_api_gateway_stage.data_api.stage_name
   domain_name = aws_api_gateway_domain_name.userapi.domain_name
 }
+
+# Enforce HTTPS on all APIs — deny HTTP requests via resource policy
+resource "aws_api_gateway_rest_api_policy" "dta_api" {
+  rest_api_id = aws_api_gateway_rest_api.dta_api.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "execute-api:Invoke"
+        Resource  = "${aws_api_gateway_rest_api.dta_api.execution_arn}/*"
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_api_gateway_rest_api_policy" "data_api" {
+  rest_api_id = aws_api_gateway_rest_api.data_api.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "execute-api:Invoke"
+        Resource  = "${aws_api_gateway_rest_api.data_api.execution_arn}/*"
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_api_gateway_rest_api_policy" "open_api" {
+  rest_api_id = aws_api_gateway_rest_api.open_api.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Deny"
+        Principal = "*"
+        Action    = "execute-api:Invoke"
+        Resource  = "${aws_api_gateway_rest_api.open_api.execution_arn}/*"
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      }
+    ]
+  })
+}

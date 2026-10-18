@@ -148,12 +148,12 @@ resource "aws_cloudfront_distribution" "root_redirect" {
   }
 
   default_cache_behavior {
-    target_origin_id           = "studup-root-redirect"
-    viewer_protocol_policy     = "redirect-to-https"
-    allowed_methods            = ["GET", "HEAD"]
-    cached_methods             = ["GET", "HEAD"]
-    compress                   = true
-    cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+    target_origin_id       = "studup-root-redirect"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
   }
 
   viewer_certificate {
