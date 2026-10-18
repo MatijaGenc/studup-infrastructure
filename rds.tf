@@ -18,10 +18,10 @@ resource "aws_db_instance" "dev" {
   db_subnet_group_name   = aws_db_subnet_group.default.name
   vpc_security_group_ids = [aws_security_group.lambda_rds.id]
 
-  publicly_accessible = false
-  multi_az            = true
-  skip_final_snapshot        = false
-  final_snapshot_identifier  = "studup-dev-final"
+  publicly_accessible       = false
+  multi_az                  = true
+  skip_final_snapshot       = false
+  final_snapshot_identifier = "studup-dev-final"
 
   backup_retention_period    = 30
   backup_window              = "05:46-06:16"
