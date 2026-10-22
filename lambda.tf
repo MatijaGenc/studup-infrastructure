@@ -66,6 +66,31 @@ resource "aws_iam_role_policy_attachment" "s3_profile_images" {
   policy_arn = aws_iam_policy.s3_profile_images.arn
 }
 
+resource "aws_iam_policy" "s3_cv_files" {
+  name        = "studup-s3-cv-files"
+  description = "Allow DataHandler Lambda to upload to CV files bucket"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetObject",
+          "s3:DeleteObject",
+        ]
+        Resource = "${aws_s3_bucket.cv_files.arn}/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "s3_cv_files" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.s3_cv_files.arn
+}
+
 resource "aws_lambda_function" "data_handler" {
   function_name = "DataHandler"
   role          = aws_iam_role.lambda.arn
@@ -88,6 +113,7 @@ resource "aws_lambda_function" "data_handler" {
       APP_LOG_LEVEL          = "debug"
       CLOUDFRONT_DOMAIN      = aws_cloudfront_distribution.studup.domain_name
       PROFILE_IMAGES_BUCKET  = aws_s3_bucket.profile_images.id
+      CV_FILES_BUCKET        = aws_s3_bucket.cv_files.id
     }
   }
 
