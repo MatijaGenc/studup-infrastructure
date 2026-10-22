@@ -28,6 +28,15 @@ resource "aws_cloudfront_distribution" "studup" {
     }
   }
 
+  origin {
+    domain_name = aws_s3_bucket.cv_files.bucket_regional_domain_name
+    origin_id   = "stud-up-cv-files"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.cv_files.cloudfront_access_identity_path
+    }
+  }
+
   ordered_cache_behavior {
     path_pattern               = "index.html"
     target_origin_id           = aws_s3_bucket_website_configuration.website.website_endpoint
@@ -42,6 +51,16 @@ resource "aws_cloudfront_distribution" "studup" {
   ordered_cache_behavior {
     path_pattern           = "images/*"
     target_origin_id       = "stud-up-profile-images"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+  }
+
+  ordered_cache_behavior {
+    path_pattern           = "cv/*"
+    target_origin_id       = "stud-up-cv-files"
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
@@ -86,6 +105,10 @@ resource "aws_cloudfront_distribution" "studup" {
 
 resource "aws_cloudfront_origin_access_identity" "profile_images" {
   comment = "OAI for stud-up-profile-images bucket"
+}
+
+resource "aws_cloudfront_origin_access_identity" "cv_files" {
+  comment = "OAI for stud-up-cv-files bucket"
 }
 
 resource "aws_cloudfront_response_headers_policy" "csp" {
