@@ -5,3 +5,4 @@
 rotation-function/build/
 authorizer/node_modules/
 authorizer/package-lock.json
+graphify-out/
