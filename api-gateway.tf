@@ -387,6 +387,17 @@ resource "aws_api_gateway_rest_api_policy" "open_api" {
     Version = "2012-10-17"
     Statement = [
       {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "execute-api:Invoke"
+        Resource  = "${aws_api_gateway_rest_api.open_api.execution_arn}/*"
+        Condition = {
+          Bool = {
+            "aws:SecureTransport" : "true"
+          }
+        }
+      },
+      {
         Effect    = "Deny"
         Principal = "*"
         Action    = "execute-api:Invoke"
@@ -399,4 +410,12 @@ resource "aws_api_gateway_rest_api_policy" "open_api" {
       }
     ]
   })
+}
+resource "aws_lambda_permission" "open_api_rest_proxy" {
+  statement_id   = "StudUpPublicRestProxyInvoke"
+  action         = "lambda:InvokeFunction"
+  function_name  = "DataHandler"
+  principal      = "apigateway.amazonaws.com"
+  source_arn     = "${aws_api_gateway_rest_api.open_api.execution_arn}/*/*/*"
+  source_account = data.aws_caller_identity.current.account_id
 }
