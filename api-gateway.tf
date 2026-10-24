@@ -192,10 +192,12 @@ resource "aws_api_gateway_deployment" "data_api" {
     aws_api_gateway_integration.data_api_any_dataapi,
     aws_api_gateway_integration.data_api_any_proxy,
     aws_api_gateway_authorizer.data_api,
+    aws_api_gateway_integration_response.data_api_preflight,
   ]
   rest_api_id = aws_api_gateway_rest_api.data_api.id
   triggers = {
     redeployment = sha1(jsonencode([
+      filesha256("${path.module}/api-gateway.tf"),
       aws_api_gateway_method.data_api_any_root.id,
       aws_api_gateway_method.data_api_any_dataapi.id,
       aws_api_gateway_method.data_api_any_proxy.id,
@@ -367,6 +369,13 @@ resource "aws_api_gateway_rest_api_policy" "data_api" {
     Version = "2012-10-17"
     Statement = [
       {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "execute-api:Invoke"
+        Resource  = "${aws_api_gateway_rest_api.data_api.execution_arn}/*/OPTIONS/*"
+        Condition = { Bool = { "aws:SecureTransport" : "true" } }
+      },
+      {
         Effect    = "Deny"
         Principal = "*"
         Action    = "execute-api:Invoke"
@@ -417,5 +426,70 @@ resource "aws_lambda_permission" "open_api_rest_proxy" {
   function_name  = "DataHandler"
   principal      = "apigateway.amazonaws.com"
   source_arn     = "${aws_api_gateway_rest_api.open_api.execution_arn}/*/*/*"
+  source_account = data.aws_caller_identity.current.account_id
+}
+
+locals {
+  data_api_preflight_resources = {
+    root  = aws_api_gateway_rest_api.data_api.root_resource_id
+    data  = aws_api_gateway_resource.data_api_data.id
+    proxy = aws_api_gateway_resource.data_api_proxy.id
+  }
+}
+
+resource "aws_api_gateway_method" "data_api_preflight" {
+  for_each      = local.data_api_preflight_resources
+  rest_api_id   = aws_api_gateway_rest_api.data_api.id
+  resource_id   = each.value
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "data_api_preflight" {
+  for_each    = local.data_api_preflight_resources
+  rest_api_id = aws_api_gateway_rest_api.data_api.id
+  resource_id = each.value
+  http_method = aws_api_gateway_method.data_api_preflight[each.key].http_method
+  type        = "MOCK"
+  request_templates = {
+    "application/json" = "{\"statusCode\":200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "data_api_preflight" {
+  for_each    = local.data_api_preflight_resources
+  rest_api_id = aws_api_gateway_rest_api.data_api.id
+  resource_id = each.value
+  http_method = aws_api_gateway_method.data_api_preflight[each.key].http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"      = true
+    "method.response.header.Access-Control-Allow-Credentials" = true
+    "method.response.header.Access-Control-Allow-Methods"     = true
+    "method.response.header.Access-Control-Allow-Headers"     = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "data_api_preflight" {
+  for_each    = local.data_api_preflight_resources
+  rest_api_id = aws_api_gateway_rest_api.data_api.id
+  resource_id = each.value
+  http_method = aws_api_gateway_method.data_api_preflight[each.key].http_method
+  status_code = aws_api_gateway_method_response.data_api_preflight[each.key].status_code
+  depends_on  = [aws_api_gateway_integration.data_api_preflight]
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
+    "method.response.header.Access-Control-Allow-Credentials" = "'true'"
+    "method.response.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+  }
+}
+
+resource "aws_lambda_permission" "data_api_rest_proxy" {
+  statement_id   = "StudUpPrivateRestProxyInvoke"
+  action         = "lambda:InvokeFunction"
+  function_name  = "DataHandler"
+  principal      = "apigateway.amazonaws.com"
+  source_arn     = "${aws_api_gateway_rest_api.data_api.execution_arn}/*/*/*"
   source_account = data.aws_caller_identity.current.account_id
 }
