@@ -290,6 +290,17 @@ resource "aws_api_gateway_deployment" "open_api" {
     aws_api_gateway_integration.open_api_any_proxy,
   ]
   rest_api_id = aws_api_gateway_rest_api.open_api.id
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_method.open_api_any_root.id,
+      aws_api_gateway_method.open_api_any_path.id,
+      aws_api_gateway_method.open_api_any_proxy.id,
+      aws_api_gateway_integration.open_api_any_root.uri,
+      aws_api_gateway_integration.open_api_any_path.uri,
+      aws_api_gateway_integration.open_api_any_proxy.uri,
+      filesha256("${path.module}/api-gateway.tf"),
+    ]))
+  }
   lifecycle {
     create_before_destroy = true
   }
