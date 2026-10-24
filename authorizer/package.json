@@ -3,6 +3,17 @@
     "version": "1.0.0",
     "private": true,
     "dependencies": {
-        "jsonwebtoken": "^9.0.2"
+        "jsonwebtoken": "^9.0.2",
+        "@aws-sdk/client-secrets-manager": "3.1156.0"
+    },
+    "scripts": {
+        "lint": "node --check index.mjs && node --check token-policy.mjs",
+        "typecheck": "tsc -p tsconfig.json",
+        "test": "node --test token-policy.test.mjs",
+        "build": "npm run lint && zip -qr ../authorizer.zip index.mjs token-policy.mjs node_modules"
+    },
+    "devDependencies": {
+        "typescript": "7.0.2",
+        "@types/jsonwebtoken": "9.0.10"
     }
 }

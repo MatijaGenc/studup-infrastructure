@@ -1,8 +1,6 @@
 *.tfvars
 .terraform/
-.terraform.lock.hcl
 *.zip
 rotation-function/build/
 authorizer/node_modules/
-authorizer/package-lock.json
 graphify-out/
