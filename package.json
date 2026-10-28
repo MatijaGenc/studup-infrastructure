@@ -1,0 +1,30 @@
+{
+    "name": "studup-infrastructure-quality",
+    "private": true,
+    "scripts": {
+        "test:gates": "node --test scripts/quality-self-test.cjs",
+        "check": "node scripts/check.cjs",
+        "typecheck": "npm --prefix authorizer run typecheck && .venv-quality/bin/mypy --check-untyped-defs --ignore-missing-imports rotation-function/rotate.py scripts/package-python.py",
+        "format:check": "terraform fmt -check -recursive && biome format . && .venv-quality/bin/ruff format --check rotation-function scripts",
+        "lint": "biome check . && .venv-quality/bin/ruff check rotation-function scripts",
+        "build": "npm --prefix authorizer run build && PATH=\"$PWD/.venv-quality/bin:$PATH\" bash rotation-function/build.sh",
+        "test": "npm --prefix authorizer test && .venv-quality/bin/python3 -m unittest discover -s rotation-function/tests -v",
+        "test:quality": "npm test && npm run test:gates",
+        "prepare": "node scripts/install-hooks.cjs",
+        "validate:terraform": "terraform validate"
+    },
+    "qualityGates": {
+        "manager": "npm",
+        "gates": [
+            "typecheck",
+            "format:check",
+            "lint",
+            "build",
+            "validate:terraform",
+            "test:quality"
+        ]
+    },
+    "devDependencies": {
+        "@biomejs/biome": "2.5.15"
+    }
+}

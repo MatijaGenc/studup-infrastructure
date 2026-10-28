@@ -4,3 +4,9 @@
 rotation-function/build/
 authorizer/node_modules/
 graphify-out/
+
+node_modules/
+.venv-quality/
+.ruff_cache/
+__pycache__/
+.mypy_cache/

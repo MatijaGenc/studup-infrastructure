@@ -1,1 +1,12 @@
-{"compilerOptions":{"allowJs":true,"checkJs":true,"noEmit":true,"strict":true,"module":"NodeNext","target":"ES2022","skipLibCheck":true},"include":["index.mjs","token-policy.mjs"]}
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": true,
+        "noEmit": true,
+        "strict": true,
+        "module": "NodeNext",
+        "target": "ES2022",
+        "skipLibCheck": true
+    },
+    "include": ["index.mjs", "token-policy.mjs"]
+}
