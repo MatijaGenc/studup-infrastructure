@@ -1,2 +1,12 @@
-pg8000==1.31.2
-boto3==1.35.0
+# Python 3.12 runtime wheels, including transitive dependencies.
+# Regenerate and validate all hashes together when updating dependencies.
+asn1crypto==1.5.1 --hash=sha256:db4e40728b728508912cbb3d44f19ce188f218e9eba635821bb4b68564f8fd67
+boto3==1.35.0 --hash=sha256:ada32dab854c46a877cf967b8a55ab1a7d356c3c87f1c8bd556d446ff03dfd95
+botocore==1.35.99 --hash=sha256:b22d27b6b617fc2d7342090d6129000af2efd20174215948c0d7ae2da0fab445
+jmespath==1.1.0 --hash=sha256:a5663118de4908c91729bea0acadca56526eb2698e83de10cd116ae0f4e97c64
+pg8000==1.31.2 --hash=sha256:436c771ede71af4d4c22ba867a30add0bc5c942d7ab27fadbb6934a487ecc8f6
+python-dateutil==2.9.0.post0 --hash=sha256:a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
+s3transfer==0.10.4 --hash=sha256:244a76a24355363a68164241438de1b72f8781664920260c48465896b712a41e
+scramp==1.5.0 --hash=sha256:8280608f568e81da9e9c9d69cac1331b836622d9b48bf5c5e400e16129c6d1fa
+six==1.17.0 --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
+urllib3==2.8.0 --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3

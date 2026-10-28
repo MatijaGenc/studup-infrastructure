@@ -1,4 +1,3 @@
-import json
 import logging
 import os
 import secrets
@@ -23,11 +22,7 @@ def generate_password(length=32):
     alphabet = string.ascii_letters + string.digits
     while True:
         password = "".join(secrets.choice(alphabet) for _ in range(length))
-        if (
-            any(c.islower() for c in password)
-            and any(c.isupper() for c in password)
-            and any(c.isdigit() for c in password)
-        ):
+        if any(c.islower() for c in password) and any(c.isupper() for c in password) and any(c.isdigit() for c in password):
             return password
 
 
@@ -52,9 +47,7 @@ def lambda_handler(event, context):
 
     version_ids = list(metadata["VersionIdsToStages"].keys())
     if token not in version_ids:
-        raise ValueError(
-            f"Rotation token {token} not found in secret {arn}"
-        )
+        raise ValueError(f"Rotation token {token} not found in secret {arn}")
 
     if metadata["VersionIdsToStages"].get(token, []) == ["AWSCURRENT"]:
         logger.info("Secret %s is already set to AWSCURRENT", arn)
@@ -73,17 +66,13 @@ def lambda_handler(event, context):
 
 
 def _get_current_password(arn):
-    response = secrets_client.get_secret_value(
-        SecretId=arn, VersionStage="AWSCURRENT"
-    )
+    response = secrets_client.get_secret_value(SecretId=arn, VersionStage="AWSCURRENT")
     return response["SecretString"]
 
 
 def _create_secret(arn, token):
     try:
-        secrets_client.get_secret_value(
-            SecretId=arn, VersionId=token, VersionStage="AWSPENDING"
-        )
+        secrets_client.get_secret_value(SecretId=arn, VersionId=token, VersionStage="AWSPENDING")
         logger.info("createSecret: AWSPENDING version %s already exists", token)
         return
     except secrets_client.exceptions.ResourceNotFoundException:
@@ -102,24 +91,18 @@ def _create_secret(arn, token):
 
 def _set_secret(arn, token):
     current = _get_current_password(arn)
-    pending = secrets_client.get_secret_value(
-        SecretId=arn, VersionId=token, VersionStage="AWSPENDING"
-    )["SecretString"]
+    pending = secrets_client.get_secret_value(SecretId=arn, VersionId=token, VersionStage="AWSPENDING")["SecretString"]
 
     conn = get_connection(current)
     with conn.cursor() as cur:
-        cur.execute(
-            "ALTER USER " + DB_USER + " WITH PASSWORD " + literal(pending)
-        )
+        cur.execute("ALTER USER " + DB_USER + " WITH PASSWORD " + literal(pending))
     conn.commit()
     conn.close()
     logger.info("setSecret: password updated for user %s", DB_USER)
 
 
 def _test_secret(arn, token):
-    pending = secrets_client.get_secret_value(
-        SecretId=arn, VersionId=token, VersionStage="AWSPENDING"
-    )["SecretString"]
+    pending = secrets_client.get_secret_value(SecretId=arn, VersionId=token, VersionStage="AWSPENDING")["SecretString"]
 
     conn = get_connection(pending)
     conn.close()

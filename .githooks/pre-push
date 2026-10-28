@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -eu
+code_push=false
+while read -r local_ref local_sha remote_ref remote_sha; do
+    if [ "$local_sha" != "0000000000000000000000000000000000000000" ]; then code_push=true; fi
+done
+if [ "$code_push" = true ]; then npm run check; fi
