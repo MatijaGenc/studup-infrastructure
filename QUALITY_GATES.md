@@ -19,3 +19,7 @@ Build creates fresh Lambda ZIPs from hash-locked Python 3.12 runtime wheels (inc
 Terraform resource/provider changes additionally need a reviewed plan against the intended environment before apply. Tooling-only changes need validation and package tests; production plan/apply is inapplicable if no resource configuration changed. Native/mobile checks are inapplicable here. No quality command deploys resources. Package/runtime behavior changes need relevant compatibility and deployment verification separately.
 
 Terraform semantic validation runs after package build because resource source hashes read the generated ZIP files. A clean checkout must build real archives before validating; placeholder ZIPs are not a valid substitute.
+
+## S-110 — Linux provider lock verification (29 October 2026)
+
+The first remote quality workflow failed Terraform validation because the Linux AWS provider package lacked a matching h1 checksum in the committed lockfile. `terraform providers lock -platform=linux_amd64 -platform=darwin_arm64` obtained signed provider checksums without changing provider versions or infrastructure resources. The additional Linux checksum is committed; validation uses a fresh Linux Terraform data directory with `init -backend=false -lockfile=readonly`. No plan/apply or production deployment is part of this correction.
