@@ -92,6 +92,8 @@ resource "aws_api_gateway_deployment" "dta_api" {
   triggers = {
     redeployment = sha1(jsonencode([
       filesha256("${path.module}/api-gateway.tf"),
+      aws_api_gateway_resource.dta_api_data.id,
+      aws_api_gateway_resource.dta_api_proxy.id,
       aws_api_gateway_method.dta_api_any_root.id,
       aws_api_gateway_method.dta_api_any_data.id,
       aws_api_gateway_method.dta_api_any_proxy.id,
@@ -211,6 +213,8 @@ resource "aws_api_gateway_deployment" "data_api" {
   triggers = {
     redeployment = sha1(jsonencode([
       filesha256("${path.module}/api-gateway.tf"),
+      aws_api_gateway_resource.data_api_data.id,
+      aws_api_gateway_resource.data_api_proxy.id,
       aws_api_gateway_method.data_api_any_root.id,
       aws_api_gateway_method.data_api_any_dataapi.id,
       aws_api_gateway_method.data_api_any_proxy.id,
@@ -323,6 +327,14 @@ resource "aws_api_gateway_deployment" "open_api" {
       aws_api_gateway_gateway_response.open_api_default_4xx.id,
       aws_api_gateway_gateway_response.open_api_default_5xx.id,
       filesha256("${path.module}/api-gateway.tf"),
+      aws_api_gateway_resource.open_api_path.id,
+      aws_api_gateway_resource.open_api_proxy.id,
+      aws_api_gateway_method.open_api_any_root.id,
+      aws_api_gateway_method.open_api_any_path.id,
+      aws_api_gateway_method.open_api_any_proxy.id,
+      aws_api_gateway_integration.open_api_any_root.id,
+      aws_api_gateway_integration.open_api_any_path.id,
+      aws_api_gateway_integration.open_api_any_proxy.id,
     ]))
   }
   lifecycle {
