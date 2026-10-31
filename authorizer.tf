@@ -38,6 +38,21 @@ resource "aws_iam_role_policy_attachment" "api_authorizer_secrets" {
   policy_arn = aws_iam_policy.api_authorizer_secrets.arn
 }
 
+resource "aws_iam_role_policy" "api_authorizer_invoke" {
+  name = "studup-api-authorizer-invoke"
+  role = aws_iam_role.api_authorizer.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
+        Resource = aws_lambda_function.api_authorizer.arn
+      }
+    ]
+  })
+}
+
 resource "aws_lambda_function" "api_authorizer" {
   function_name    = "studup-api-authorizer"
   role             = aws_iam_role.api_authorizer.arn
@@ -54,7 +69,7 @@ resource "aws_lambda_permission" "api_authorizer_data_api" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.api_authorizer.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.data_api.execution_arn}/*"
+  source_arn    = "${aws_api_gateway_rest_api.data_api.execution_arn}/authorizers/*"
 }
 
 resource "aws_lambda_permission" "api_authorizer_dta_api" {
@@ -62,5 +77,5 @@ resource "aws_lambda_permission" "api_authorizer_dta_api" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.api_authorizer.function_name
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.dta_api.execution_arn}/*"
+  source_arn    = "${aws_api_gateway_rest_api.dta_api.execution_arn}/authorizers/*"
 }
