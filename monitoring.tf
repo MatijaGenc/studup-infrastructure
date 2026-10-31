@@ -120,3 +120,55 @@ resource "aws_cloudwatch_metric_alarm" "health_check_failure" {
   alarm_description   = "Health check endpoint returned 503 (database unreachable)"
   alarm_actions       = [aws_sns_topic.alarms.arn]
 }
+
+resource "aws_cloudwatch_metric_alarm" "rds_cpu" {
+  alarm_name          = "studup-rds-cpu-utilization"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/RDS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "80"
+  alarm_description   = "RDS CPU utilization exceeded 80% for 10 minutes"
+  alarm_actions       = [aws_sns_topic.alarms.arn]
+
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.dev.identifier
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "rds_connections" {
+  alarm_name          = "studup-rds-database-connections"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "DatabaseConnections"
+  namespace           = "AWS/RDS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "60"
+  alarm_description   = "RDS database connections approach max_connections (t3.micro default 85)"
+  alarm_actions       = [aws_sns_topic.alarms.arn]
+
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.dev.identifier
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "rds_free_storage" {
+  alarm_name          = "studup-rds-free-storage-space"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "FreeStorageSpace"
+  namespace           = "AWS/RDS"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "5368709120"
+  unit                = "Bytes"
+  alarm_description   = "RDS free storage space below 5GB"
+  alarm_actions       = [aws_sns_topic.alarms.arn]
+
+  dimensions = {
+    DBInstanceIdentifier = aws_db_instance.dev.identifier
+  }
+}
