@@ -158,24 +158,24 @@ resource "aws_api_gateway_deployment" "dta_api" {
 }
 
 resource "aws_api_gateway_stage" "dta_api" {
-  rest_api_id   = aws_api_gateway_rest_api.dta_api.id
-  stage_name    = "development"
-  deployment_id = aws_api_gateway_deployment.dta_api.id
+  rest_api_id          = aws_api_gateway_rest_api.dta_api.id
+  stage_name           = "development"
+  deployment_id        = aws_api_gateway_deployment.dta_api.id
   xray_tracing_enabled = true
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_gateway_dta.arn
     format = jsonencode({
-      requestId      = "$context.requestId"
-      sourceIp       = "$context.identity.sourceIp"
-      method         = "$context.httpMethod"
-      resourcePath   = "$context.resourcePath"
-      status         = "$context.status"
-      protocol       = "$context.protocol"
-      responseLength = "$context.responseLength"
+      requestId          = "$context.requestId"
+      sourceIp           = "$context.identity.sourceIp"
+      method             = "$context.httpMethod"
+      resourcePath       = "$context.resourcePath"
+      status             = "$context.status"
+      protocol           = "$context.protocol"
+      responseLength     = "$context.responseLength"
       integrationLatency = "$context.integrationLatency"
       responseLatency    = "$context.responseLatency"
-      stage          = "$context.stage"
+      stage              = "$context.stage"
     })
   }
 }
@@ -301,24 +301,24 @@ resource "aws_api_gateway_deployment" "data_api" {
 }
 
 resource "aws_api_gateway_stage" "data_api" {
-  rest_api_id   = aws_api_gateway_rest_api.data_api.id
-  stage_name    = "default"
-  deployment_id = aws_api_gateway_deployment.data_api.id
+  rest_api_id          = aws_api_gateway_rest_api.data_api.id
+  stage_name           = "default"
+  deployment_id        = aws_api_gateway_deployment.data_api.id
   xray_tracing_enabled = true
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_gateway_data.arn
     format = jsonencode({
-      requestId      = "$context.requestId"
-      sourceIp       = "$context.identity.sourceIp"
-      method         = "$context.httpMethod"
-      resourcePath   = "$context.resourcePath"
-      status         = "$context.status"
-      protocol       = "$context.protocol"
-      responseLength = "$context.responseLength"
+      requestId          = "$context.requestId"
+      sourceIp           = "$context.identity.sourceIp"
+      method             = "$context.httpMethod"
+      resourcePath       = "$context.resourcePath"
+      status             = "$context.status"
+      protocol           = "$context.protocol"
+      responseLength     = "$context.responseLength"
       integrationLatency = "$context.integrationLatency"
       responseLatency    = "$context.responseLatency"
-      stage          = "$context.stage"
+      stage              = "$context.stage"
     })
   }
 }
@@ -431,24 +431,24 @@ resource "aws_api_gateway_deployment" "open_api" {
 }
 
 resource "aws_api_gateway_stage" "open_api" {
-  rest_api_id   = aws_api_gateway_rest_api.open_api.id
-  stage_name    = "default"
-  deployment_id = aws_api_gateway_deployment.open_api.id
+  rest_api_id          = aws_api_gateway_rest_api.open_api.id
+  stage_name           = "default"
+  deployment_id        = aws_api_gateway_deployment.open_api.id
   xray_tracing_enabled = true
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_gateway_open.arn
     format = jsonencode({
-      requestId      = "$context.requestId"
-      sourceIp       = "$context.identity.sourceIp"
-      method         = "$context.httpMethod"
-      resourcePath   = "$context.resourcePath"
-      status         = "$context.status"
-      protocol       = "$context.protocol"
-      responseLength = "$context.responseLength"
+      requestId          = "$context.requestId"
+      sourceIp           = "$context.identity.sourceIp"
+      method             = "$context.httpMethod"
+      resourcePath       = "$context.resourcePath"
+      status             = "$context.status"
+      protocol           = "$context.protocol"
+      responseLength     = "$context.responseLength"
       integrationLatency = "$context.integrationLatency"
       responseLatency    = "$context.responseLatency"
-      stage          = "$context.stage"
+      stage              = "$context.stage"
     })
   }
 }
