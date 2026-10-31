@@ -1,0 +1,5 @@
+{
+    "type": "TOKEN",
+    "authorizationToken": "Bearer TEST_TOKEN_PLACEHOLDER",
+    "methodArn": "arn:aws:execute-api:eu-south-1:123456789012:a5ljx6xmme/development/PATCH/users/me"
+}

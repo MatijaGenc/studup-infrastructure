@@ -2,13 +2,16 @@ import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-sec
 import { authorizeToken, tokenFromEvent } from './token-policy.mjs'
 
 const secretsManager = new SecretsManagerClient({ region: 'eu-south-1' })
+const jwtSecretTtlMs = 5 * 60 * 1000
 /** @type {string | null} */
 let cachedJwtSecret = null
+let cachedJwtSecretExpiresAt = 0
 async function getJwtSecret() {
-    if (cachedJwtSecret) return cachedJwtSecret
+    if (cachedJwtSecret && Date.now() < cachedJwtSecretExpiresAt) return cachedJwtSecret
     const response = await secretsManager.send(new GetSecretValueCommand({ SecretId: 'studup-jwt-secret' }))
     if (!response.SecretString) throw new Error('JWT secret is unavailable')
     cachedJwtSecret = response.SecretString
+    cachedJwtSecretExpiresAt = Date.now() + jwtSecretTtlMs
     return cachedJwtSecret
 }
 /** @param {import('./token-policy.mjs').AuthorizerEvent} event */

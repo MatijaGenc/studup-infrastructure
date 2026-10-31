@@ -18,12 +18,13 @@ resource "aws_api_gateway_resource" "dta_api_proxy" {
 }
 
 resource "aws_api_gateway_authorizer" "dta_api" {
-  name                   = "studup-jwt-authorizer"
-  rest_api_id            = aws_api_gateway_rest_api.dta_api.id
-  authorizer_uri         = aws_lambda_function.api_authorizer.invoke_arn
-  authorizer_credentials = aws_iam_role.api_authorizer.arn
-  type                   = "TOKEN"
-  identity_source        = "method.request.header.Authorization"
+  name                             = "studup-jwt-authorizer"
+  rest_api_id                      = aws_api_gateway_rest_api.dta_api.id
+  authorizer_uri                   = aws_lambda_function.api_authorizer.invoke_arn
+  authorizer_credentials           = aws_iam_role.api_authorizer.arn
+  type                             = "TOKEN"
+  identity_source                  = "method.request.header.Authorization"
+  authorizer_result_ttl_in_seconds = 300
 }
 
 resource "aws_api_gateway_method" "dta_api_any_root" {
@@ -83,10 +84,14 @@ resource "aws_api_gateway_deployment" "dta_api" {
     aws_api_gateway_integration.dta_api_any_data,
     aws_api_gateway_integration.dta_api_any_proxy,
     aws_api_gateway_authorizer.dta_api,
+    aws_api_gateway_integration_response.dta_api_preflight,
+    aws_api_gateway_gateway_response.dta_api_default_4xx,
+    aws_api_gateway_gateway_response.dta_api_default_5xx,
   ]
   rest_api_id = aws_api_gateway_rest_api.dta_api.id
   triggers = {
     redeployment = sha1(jsonencode([
+      filesha256("${path.module}/api-gateway.tf"),
       aws_api_gateway_method.dta_api_any_root.id,
       aws_api_gateway_method.dta_api_any_data.id,
       aws_api_gateway_method.dta_api_any_proxy.id,
@@ -94,6 +99,11 @@ resource "aws_api_gateway_deployment" "dta_api" {
       aws_api_gateway_integration.dta_api_any_data.id,
       aws_api_gateway_integration.dta_api_any_proxy.id,
       aws_api_gateway_authorizer.dta_api.id,
+      aws_api_gateway_method.dta_api_preflight,
+      aws_api_gateway_integration.dta_api_preflight,
+      aws_api_gateway_integration_response.dta_api_preflight,
+      aws_api_gateway_gateway_response.dta_api_default_4xx.id,
+      aws_api_gateway_gateway_response.dta_api_default_5xx.id,
     ]))
   }
   lifecycle {
@@ -127,12 +137,13 @@ resource "aws_api_gateway_resource" "data_api_proxy" {
 }
 
 resource "aws_api_gateway_authorizer" "data_api" {
-  name                   = "studup-jwt-authorizer"
-  rest_api_id            = aws_api_gateway_rest_api.data_api.id
-  authorizer_uri         = aws_lambda_function.api_authorizer.invoke_arn
-  authorizer_credentials = aws_iam_role.api_authorizer.arn
-  type                   = "TOKEN"
-  identity_source        = "method.request.header.Authorization"
+  name                             = "studup-jwt-authorizer"
+  rest_api_id                      = aws_api_gateway_rest_api.data_api.id
+  authorizer_uri                   = aws_lambda_function.api_authorizer.invoke_arn
+  authorizer_credentials           = aws_iam_role.api_authorizer.arn
+  type                             = "TOKEN"
+  identity_source                  = "method.request.header.Authorization"
+  authorizer_result_ttl_in_seconds = 300
 }
 
 resource "aws_api_gateway_method" "data_api_any_root" {
@@ -193,6 +204,8 @@ resource "aws_api_gateway_deployment" "data_api" {
     aws_api_gateway_integration.data_api_any_proxy,
     aws_api_gateway_authorizer.data_api,
     aws_api_gateway_integration_response.data_api_preflight,
+    aws_api_gateway_gateway_response.data_api_default_4xx,
+    aws_api_gateway_gateway_response.data_api_default_5xx,
   ]
   rest_api_id = aws_api_gateway_rest_api.data_api.id
   triggers = {
@@ -205,6 +218,11 @@ resource "aws_api_gateway_deployment" "data_api" {
       aws_api_gateway_integration.data_api_any_dataapi.id,
       aws_api_gateway_integration.data_api_any_proxy.id,
       aws_api_gateway_authorizer.data_api.id,
+      aws_api_gateway_method.data_api_preflight,
+      aws_api_gateway_integration.data_api_preflight,
+      aws_api_gateway_integration_response.data_api_preflight,
+      aws_api_gateway_gateway_response.data_api_default_4xx.id,
+      aws_api_gateway_gateway_response.data_api_default_5xx.id,
     ]))
   }
   lifecycle {
@@ -290,6 +308,8 @@ resource "aws_api_gateway_deployment" "open_api" {
     aws_api_gateway_integration.open_api_any_root,
     aws_api_gateway_integration.open_api_any_path,
     aws_api_gateway_integration.open_api_any_proxy,
+    aws_api_gateway_gateway_response.open_api_default_4xx,
+    aws_api_gateway_gateway_response.open_api_default_5xx,
   ]
   rest_api_id = aws_api_gateway_rest_api.open_api.id
   triggers = {
@@ -300,6 +320,8 @@ resource "aws_api_gateway_deployment" "open_api" {
       aws_api_gateway_integration.open_api_any_root.uri,
       aws_api_gateway_integration.open_api_any_path.uri,
       aws_api_gateway_integration.open_api_any_proxy.uri,
+      aws_api_gateway_gateway_response.open_api_default_4xx.id,
+      aws_api_gateway_gateway_response.open_api_default_5xx.id,
       filesha256("${path.module}/api-gateway.tf"),
     ]))
   }
@@ -312,6 +334,70 @@ resource "aws_api_gateway_stage" "open_api" {
   rest_api_id   = aws_api_gateway_rest_api.open_api.id
   stage_name    = "default"
   deployment_id = aws_api_gateway_deployment.open_api.id
+}
+
+resource "aws_api_gateway_gateway_response" "dta_api_default_4xx" {
+  rest_api_id   = aws_api_gateway_rest_api.dta_api.id
+  response_type = "DEFAULT_4XX"
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
+    "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
+    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "dta_api_default_5xx" {
+  rest_api_id   = aws_api_gateway_rest_api.dta_api.id
+  response_type = "DEFAULT_5XX"
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
+    "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
+    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "data_api_default_4xx" {
+  rest_api_id   = aws_api_gateway_rest_api.data_api.id
+  response_type = "DEFAULT_4XX"
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
+    "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
+    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "data_api_default_5xx" {
+  rest_api_id   = aws_api_gateway_rest_api.data_api.id
+  response_type = "DEFAULT_5XX"
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
+    "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
+    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "open_api_default_4xx" {
+  rest_api_id   = aws_api_gateway_rest_api.open_api.id
+  response_type = "DEFAULT_4XX"
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+  }
+}
+
+resource "aws_api_gateway_gateway_response" "open_api_default_5xx" {
+  rest_api_id   = aws_api_gateway_rest_api.open_api.id
+  response_type = "DEFAULT_5XX"
+  response_parameters = {
+    "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+  }
 }
 
 resource "aws_api_gateway_domain_name" "openapi" {
@@ -348,6 +434,13 @@ resource "aws_api_gateway_rest_api_policy" "dta_api" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      {
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "execute-api:Invoke"
+        Resource  = "${aws_api_gateway_rest_api.dta_api.execution_arn}/*/OPTIONS/*"
+        Condition = { Bool = { "aws:SecureTransport" : "true" } }
+      },
       {
         Effect    = "Deny"
         Principal = "*"
@@ -430,10 +523,63 @@ resource "aws_lambda_permission" "open_api_rest_proxy" {
 }
 
 locals {
+  dta_api_preflight_resources = {
+    root  = aws_api_gateway_rest_api.dta_api.root_resource_id
+    data  = aws_api_gateway_resource.dta_api_data.id
+    proxy = aws_api_gateway_resource.dta_api_proxy.id
+  }
   data_api_preflight_resources = {
     root  = aws_api_gateway_rest_api.data_api.root_resource_id
     data  = aws_api_gateway_resource.data_api_data.id
     proxy = aws_api_gateway_resource.data_api_proxy.id
+  }
+}
+
+resource "aws_api_gateway_method" "dta_api_preflight" {
+  for_each      = local.dta_api_preflight_resources
+  rest_api_id   = aws_api_gateway_rest_api.dta_api.id
+  resource_id   = each.value
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "dta_api_preflight" {
+  for_each    = local.dta_api_preflight_resources
+  rest_api_id = aws_api_gateway_rest_api.dta_api.id
+  resource_id = each.value
+  http_method = aws_api_gateway_method.dta_api_preflight[each.key].http_method
+  type        = "MOCK"
+  request_templates = {
+    "application/json" = "{\"statusCode\":200}"
+  }
+}
+
+resource "aws_api_gateway_method_response" "dta_api_preflight" {
+  for_each    = local.dta_api_preflight_resources
+  rest_api_id = aws_api_gateway_rest_api.dta_api.id
+  resource_id = each.value
+  http_method = aws_api_gateway_method.dta_api_preflight[each.key].http_method
+  status_code = "200"
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"      = true
+    "method.response.header.Access-Control-Allow-Credentials" = true
+    "method.response.header.Access-Control-Allow-Methods"     = true
+    "method.response.header.Access-Control-Allow-Headers"     = true
+  }
+}
+
+resource "aws_api_gateway_integration_response" "dta_api_preflight" {
+  for_each    = local.dta_api_preflight_resources
+  rest_api_id = aws_api_gateway_rest_api.dta_api.id
+  resource_id = each.value
+  http_method = aws_api_gateway_method.dta_api_preflight[each.key].http_method
+  status_code = aws_api_gateway_method_response.dta_api_preflight[each.key].status_code
+  depends_on  = [aws_api_gateway_integration.dta_api_preflight]
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
+    "method.response.header.Access-Control-Allow-Credentials" = "'true'"
+    "method.response.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
   }
 }
 

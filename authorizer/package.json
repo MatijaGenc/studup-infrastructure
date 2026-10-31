@@ -9,7 +9,7 @@
     "scripts": {
         "lint": "node --check index.mjs && node --check token-policy.mjs",
         "typecheck": "tsc -p tsconfig.json",
-        "test": "node --test token-policy.test.mjs",
+        "test": "node --test token-policy.test.mjs events.test.mjs",
         "build": "npm run lint && node ../scripts/package-authorizer.cjs"
     },
     "devDependencies": {

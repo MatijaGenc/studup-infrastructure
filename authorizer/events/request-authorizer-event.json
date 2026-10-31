@@ -1,0 +1,52 @@
+{
+    "type": "REQUEST",
+    "methodArn": "arn:aws:execute-api:eu-south-1:123456789012:a5ljx6xmme/development/PATCH/users/me",
+    "resource": "/users/me",
+    "path": "/users/me",
+    "httpMethod": "PATCH",
+    "headers": {
+        "Accept": "application/json",
+        "Authorization": "Bearer TEST_TOKEN_PLACEHOLDER",
+        "Content-Type": "application/json",
+        "Host": "userapi.studup.net",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+        "X-Access-Token": "TEST_TOKEN_PLACEHOLDER"
+    },
+    "multiValueHeaders": {
+        "Accept": ["application/json"],
+        "Authorization": ["Bearer TEST_TOKEN_PLACEHOLDER"],
+        "Content-Type": ["application/json"],
+        "Host": ["userapi.studup.net"]
+    },
+    "queryStringParameters": null,
+    "multiValueQueryStringParameters": null,
+    "pathParameters": null,
+    "stageVariables": null,
+    "requestContext": {
+        "accountId": "123456789012",
+        "apiId": "a5ljx6xmme",
+        "domainName": "userapi.studup.net",
+        "domainPrefix": "userapi",
+        "extendedRequestId": "TEST_EXTENDED_REQUEST_ID",
+        "httpMethod": "PATCH",
+        "identity": {
+            "accessKey": null,
+            "accountId": null,
+            "caller": null,
+            "cognitoIdentityPoolId": null,
+            "principalOrgId": null,
+            "sourceIp": "203.0.113.10",
+            "user": null,
+            "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+            "userArn": null
+        },
+        "path": "/development/users/me",
+        "protocol": "HTTP/1.1",
+        "requestId": "TEST_REQUEST_ID",
+        "requestTime": "31/Oct/2026:10:00:00 +0000",
+        "requestTimeEpoch": 1793527200000,
+        "resourceId": "test1a",
+        "resourcePath": "/users/me",
+        "stage": "development"
+    }
+}
