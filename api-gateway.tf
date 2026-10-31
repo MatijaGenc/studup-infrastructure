@@ -461,6 +461,9 @@ resource "aws_cloudwatch_log_group" "api_gateway_open" {
 resource "aws_api_gateway_gateway_response" "dta_api_default_4xx" {
   rest_api_id   = aws_api_gateway_rest_api.dta_api.id
   response_type = "DEFAULT_4XX"
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
@@ -472,6 +475,9 @@ resource "aws_api_gateway_gateway_response" "dta_api_default_4xx" {
 resource "aws_api_gateway_gateway_response" "dta_api_default_5xx" {
   rest_api_id   = aws_api_gateway_rest_api.dta_api.id
   response_type = "DEFAULT_5XX"
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
@@ -483,6 +489,9 @@ resource "aws_api_gateway_gateway_response" "dta_api_default_5xx" {
 resource "aws_api_gateway_gateway_response" "data_api_default_4xx" {
   rest_api_id   = aws_api_gateway_rest_api.data_api.id
   response_type = "DEFAULT_4XX"
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
@@ -494,6 +503,9 @@ resource "aws_api_gateway_gateway_response" "data_api_default_4xx" {
 resource "aws_api_gateway_gateway_response" "data_api_default_5xx" {
   rest_api_id   = aws_api_gateway_rest_api.data_api.id
   response_type = "DEFAULT_5XX"
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
@@ -505,6 +517,9 @@ resource "aws_api_gateway_gateway_response" "data_api_default_5xx" {
 resource "aws_api_gateway_gateway_response" "open_api_default_4xx" {
   rest_api_id   = aws_api_gateway_rest_api.open_api.id
   response_type = "DEFAULT_4XX"
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
     "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Access-Token'"
@@ -515,6 +530,9 @@ resource "aws_api_gateway_gateway_response" "open_api_default_4xx" {
 resource "aws_api_gateway_gateway_response" "open_api_default_5xx" {
   rest_api_id   = aws_api_gateway_rest_api.open_api.id
   response_type = "DEFAULT_5XX"
+  response_templates = {
+    "application/json" = "{\"message\":$context.error.messageString}"
+  }
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
     "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Access-Token'"

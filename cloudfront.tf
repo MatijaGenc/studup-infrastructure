@@ -1,3 +1,12 @@
+resource "aws_cloudfront_function" "spa_routing" {
+  provider = aws.us-east-1
+  name     = "studup-spa-routing"
+  runtime  = "cloudfront-js-2.0"
+  comment  = "Serve index.html for known SPA routes without hiding 404s for unknown URLs"
+  publish  = true
+  code     = file("${path.module}/cloudfront-functions/spa-routing.js")
+}
+
 resource "aws_cloudfront_distribution" "studup" {
   enabled         = true
   comment         = ""
@@ -14,7 +23,7 @@ resource "aws_cloudfront_distribution" "studup" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "https-only"
+      origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
@@ -76,6 +85,11 @@ resource "aws_cloudfront_distribution" "studup" {
     compress                   = true
     cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6"
     response_headers_policy_id = aws_cloudfront_response_headers_policy.csp.id
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.spa_routing.arn
+    }
   }
 
   viewer_certificate {
@@ -166,7 +180,7 @@ resource "aws_cloudfront_distribution" "root_redirect" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "https-only"
+      origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
