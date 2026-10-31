@@ -222,3 +222,16 @@ Secrets are never stored in version control:
 - **Local**: `terraform.tfvars` (gitignored)
 - **CI**: GitHub Actions Secrets
 - **Production**: AWS Secrets Manager (Lambda fetches at cold start)
+## GitHub Actions OIDC
+
+`github-oidc.tf` provisions a GitHub OIDC provider and two main-branch-scoped roles:
+
+- `studup-github-backend-deploy` — update/invoke `DataHandler` and `studup-db-migrator`.
+- `studup-github-frontend-deploy` — sync `studup-website` and invalidate the CloudFront distribution.
+
+After applying, set these repository variables (they are not secrets):
+
+- backend repository: `AWS_BACKEND_DEPLOY_ROLE_ARN`
+- frontend repository: `AWS_FRONTEND_DEPLOY_ROLE_ARN`
+
+Workflows no longer read `AWS_ACCESS_KEY_ID`/`AWS_SECRET_ACCESS_KEY` and assume the roles with `permissions: id-token: write`. Trust is limited to `refs/heads/main`, so pull-request workflows cannot deploy.
