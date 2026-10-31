@@ -1,5 +1,6 @@
 import importlib.util
 from pathlib import Path
+import ssl
 import sys
 import types
 import unittest
@@ -12,6 +13,7 @@ class RotationValidation(unittest.TestCase):
         boto = types.ModuleType("boto3")
         boto.client = MagicMock(return_value=self.client)
         pg = types.ModuleType("pg8000")
+        pg.connect = MagicMock()
         native = types.ModuleType("pg8000.native")
         native.literal = MagicMock()
         spec = importlib.util.spec_from_file_location("rotation_under_test", Path(__file__).parents[1] / "rotate.py")
@@ -43,3 +45,37 @@ class RotationValidation(unittest.TestCase):
         self.assertTrue(any(c.islower() for c in password))
         self.assertTrue(any(c.isupper() for c in password))
         self.assertTrue(any(c.isdigit() for c in password))
+
+    def test_ssl_context_requires_certificate_and_hostname_verification(self):
+        context = self.module.build_ssl_context()
+        self.assertEqual(context.verify_mode, ssl.CERT_REQUIRED)
+        self.assertTrue(context.check_hostname)
+
+    def test_ssl_context_uses_bundled_rds_ca(self):
+        bundle = Path(self.module.__file__).with_name("global-bundle.pem")
+        self.assertEqual(self.module.CA_BUNDLE, bundle)
+        with patch("ssl.create_default_context") as create_default_context:
+            context = self.module.build_ssl_context()
+        create_default_context.assert_called_once_with(cafile=str(bundle))
+        self.assertIs(context, create_default_context.return_value)
+
+    def test_get_connection_passes_ssl_context_to_pg8000(self):
+        sentinel = self.module.build_ssl_context()
+        with patch.object(self.module, "build_ssl_context", return_value=sentinel):
+            self.module.get_connection("not-a-real-password")
+        self.module.pg8000.connect.assert_called_once_with(
+            host=self.module.DB_HOST,
+            port=self.module.DB_PORT,
+            user=self.module.DB_USER,
+            password="not-a-real-password",
+            database=self.module.DB_NAME,
+            ssl_context=sentinel,
+        )
+
+    def test_missing_ca_bundle_raises_clear_error(self):
+        missing = Path(self.module.__file__).with_name("missing-global-bundle.pem")
+        with patch.object(self.module, "CA_BUNDLE", missing):
+            with self.assertRaises(FileNotFoundError) as caught:
+                self.module.build_ssl_context()
+        self.assertIn("RDS CA bundle not found", str(caught.exception))
+        self.assertIn(str(missing), str(caught.exception))

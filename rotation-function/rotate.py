@@ -1,7 +1,9 @@
 import logging
 import os
 import secrets
+import ssl
 import string
+from pathlib import Path
 
 import boto3
 import pg8000
@@ -17,6 +19,8 @@ DB_PORT = int(os.environ.get("DB_PORT", "5432"))
 DB_USER = os.environ.get("DB_USER", "postgres")
 DB_NAME = os.environ.get("DB_NAME", "postgres")
 
+CA_BUNDLE = Path(__file__).with_name("global-bundle.pem")
+
 
 def generate_password(length=32):
     alphabet = string.ascii_letters + string.digits
@@ -26,6 +30,16 @@ def generate_password(length=32):
             return password
 
 
+def build_ssl_context():
+    if not CA_BUNDLE.is_file():
+        raise FileNotFoundError(f"RDS CA bundle not found at {CA_BUNDLE}; refusing to connect without certificate verification")
+
+    context = ssl.create_default_context(cafile=str(CA_BUNDLE))
+    context.check_hostname = True
+    context.verify_mode = ssl.CERT_REQUIRED
+    return context
+
+
 def get_connection(password):
     return pg8000.connect(
         host=DB_HOST,
@@ -33,6 +47,7 @@ def get_connection(password):
         user=DB_USER,
         password=password,
         database=DB_NAME,
+        ssl_context=build_ssl_context(),
     )
 
 
