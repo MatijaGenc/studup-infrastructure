@@ -14,7 +14,7 @@ resource "aws_cloudfront_distribution" "studup" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "http-only"
+      origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
@@ -156,6 +156,7 @@ resource "aws_cloudfront_distribution" "root_redirect" {
   price_class     = "PriceClass_100"
   http_version    = "http2"
   is_ipv6_enabled = true
+  web_acl_id      = aws_wafv2_web_acl.cloudfront.arn
 
   aliases = ["studup.net"]
 
@@ -165,7 +166,7 @@ resource "aws_cloudfront_distribution" "root_redirect" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "http-only"
+      origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
   }
