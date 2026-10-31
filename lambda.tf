@@ -114,6 +114,8 @@ resource "aws_lambda_function" "data_handler" {
       CLOUDFRONT_DOMAIN      = aws_cloudfront_distribution.studup.domain_name
       PROFILE_IMAGES_BUCKET  = aws_s3_bucket.profile_images.id
       CV_FILES_BUCKET        = aws_s3_bucket.cv_files.id
+      APP_DATABASE_USER      = "studup_app"
+      APP_DATABASE_SECRET_ID = aws_secretsmanager_secret.app_database_password.name
     }
   }
 
@@ -122,7 +124,6 @@ resource "aws_lambda_function" "data_handler" {
       runtime,
       s3_key,
       s3_bucket,
-      environment,
     ]
   }
 }
