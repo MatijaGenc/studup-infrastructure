@@ -41,3 +41,12 @@ output "api_gateway_userapi_url" {
 output "route53_zone_id" {
   value = aws_route53_zone.studup.zone_id
 }
+output "github_backend_deploy_role_arn" {
+  description = "Set as the AWS_BACKEND_DEPLOY_ROLE_ARN repository variable"
+  value       = aws_iam_role.github_backend_deploy.arn
+}
+
+output "github_frontend_deploy_role_arn" {
+  description = "Set as the AWS_FRONTEND_DEPLOY_ROLE_ARN repository variable"
+  value       = aws_iam_role.github_frontend_deploy.arn
+}
