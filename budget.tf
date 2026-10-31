@@ -1,7 +1,7 @@
 resource "aws_budgets_budget" "monthly" {
   name         = "studup-monthly-budget"
   budget_type  = "COST"
-  limit_amount = "30"
+  limit_amount = "80"
   limit_unit   = "USD"
   time_unit    = "MONTHLY"
 
