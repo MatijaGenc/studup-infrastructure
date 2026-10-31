@@ -18,6 +18,14 @@ output "profile_images_bucket" {
   value = aws_s3_bucket.profile_images.id
 }
 
+output "db_migrator_function_name" {
+  value = aws_lambda_function.db_migrator.function_name
+}
+
+output "app_database_secret_name" {
+  value = aws_secretsmanager_secret.app_database_password.name
+}
+
 output "rds_endpoint" {
   value = aws_db_instance.dev.endpoint
 }
