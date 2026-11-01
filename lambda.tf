@@ -133,6 +133,9 @@ resource "aws_lambda_function" "data_handler" {
       PROFILE_IMAGES_BUCKET  = aws_s3_bucket.profile_images.id
       CV_FILES_BUCKET        = aws_s3_bucket.cv_files.id
       APP_DATABASE_USER      = "studup_app"
+      APP_DATABASE_HOST      = "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com"
+      APP_DATABASE_NAME      = "postgres"
+      APP_DATABASE_PORT      = "5432"
       APP_DATABASE_SECRET_ID = aws_secretsmanager_secret.app_database_password.name
       NODE_EXTRA_CA_CERTS    = "/var/task/global-bundle.pem"
     }
