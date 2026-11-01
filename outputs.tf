@@ -2,6 +2,10 @@ output "lambda_function_name" {
   value = aws_lambda_function.data_handler.function_name
 }
 
+output "outbox_worker_function_name" {
+  value = aws_lambda_function.outbox_worker.function_name
+}
+
 output "lambda_role_arn" {
   value = aws_iam_role.lambda.arn
 }

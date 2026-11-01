@@ -149,3 +149,71 @@ resource "aws_lambda_function" "data_handler" {
     ]
   }
 }
+
+resource "aws_cloudwatch_log_group" "outbox_worker" {
+  name              = "/aws/lambda/studup-outbox-worker"
+  retention_in_days = 30
+}
+
+resource "aws_lambda_function" "outbox_worker" {
+  function_name = "studup-outbox-worker"
+  role          = aws_iam_role.lambda.arn
+  handler       = "outboxWorker.handler"
+  runtime       = "nodejs24.x" # actual deployed: nodejs26.x (outdated provider enum, updated via CLI)
+  memory_size   = var.lambda_memory_size
+  timeout       = 60
+  s3_bucket     = "studup-terraform-state"
+  s3_key        = var.lambda_s3_key
+
+  vpc_config {
+    subnet_ids         = local.subnet_ids
+    security_group_ids = [aws_security_group.lambda_rds.id]
+  }
+
+  environment {
+    variables = {
+      APP_EMAIL_FROM_ADDRESS = var.email_from_address
+      APP_SUPPORT_EMAIL      = var.support_email
+      APP_LOG_LEVEL          = var.lambda_log_level
+      CLOUDFRONT_DOMAIN      = aws_cloudfront_distribution.studup.domain_name
+      PROFILE_IMAGES_BUCKET  = aws_s3_bucket.profile_images.id
+      CV_FILES_BUCKET        = aws_s3_bucket.cv_files.id
+      APP_DATABASE_USER      = "studup_app"
+      APP_DATABASE_HOST      = "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com"
+      APP_DATABASE_NAME      = "postgres"
+      APP_DATABASE_PORT      = "5432"
+      APP_DATABASE_SECRET_ID = aws_secretsmanager_secret.app_database_password.name
+      NODE_EXTRA_CA_CERTS    = "/var/task/global-bundle.pem"
+    }
+  }
+
+  depends_on = [aws_cloudwatch_log_group.outbox_worker]
+
+  lifecycle {
+    ignore_changes = [
+      runtime,
+      s3_key,
+      s3_bucket,
+    ]
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "outbox_schedule" {
+  name                = "studup-outbox-worker-schedule"
+  description         = "Runs the notification outbox worker every minute"
+  schedule_expression = "rate(1 minute)"
+}
+
+resource "aws_cloudwatch_event_target" "outbox_worker" {
+  rule      = aws_cloudwatch_event_rule.outbox_schedule.name
+  target_id = "studup-outbox-worker"
+  arn       = aws_lambda_function.outbox_worker.arn
+}
+
+resource "aws_lambda_permission" "outbox_events" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.outbox_worker.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.outbox_schedule.arn
+}

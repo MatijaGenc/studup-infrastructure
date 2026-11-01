@@ -172,3 +172,45 @@ resource "aws_cloudwatch_metric_alarm" "rds_free_storage" {
     DBInstanceIdentifier = aws_db_instance.dev.identifier
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "outbox_worker_errors" {
+  alarm_name          = "studup-outbox-worker-errors"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = "300"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "Outbox worker Lambda errors"
+  alarm_actions       = [aws_sns_topic.alarms.arn]
+
+  dimensions = {
+    FunctionName = aws_lambda_function.outbox_worker.function_name
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "outbox_delivery_failures" {
+  name           = "studup-outbox-delivery-failures"
+  pattern        = "{ $.msg = \"Outbox worker completed\" && $.failed > 0 }"
+  log_group_name = aws_cloudwatch_log_group.outbox_worker.name
+
+  metric_transformation {
+    name      = "OutboxDeliveryFailures"
+    namespace = "StudUp"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "outbox_delivery_failures" {
+  alarm_name          = "studup-outbox-delivery-failures"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "OutboxDeliveryFailures"
+  namespace           = "StudUp"
+  period              = "300"
+  statistic           = "Sum"
+  threshold           = "0"
+  alarm_description   = "Outbox worker reported failed notification deliveries"
+  alarm_actions       = [aws_sns_topic.alarms.arn]
+}

@@ -5,6 +5,7 @@ locals {
   backend_functions = [
     "DataHandler",
     "studup-db-migrator",
+    "studup-outbox-worker",
   ]
 }
 
