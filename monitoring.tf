@@ -213,4 +213,5 @@ resource "aws_cloudwatch_metric_alarm" "outbox_delivery_failures" {
   threshold           = "0"
   alarm_description   = "Outbox worker reported failed notification deliveries"
   alarm_actions       = [aws_sns_topic.alarms.arn]
+  treat_missing_data  = "notBreaching"
 }

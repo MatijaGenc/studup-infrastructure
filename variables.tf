@@ -72,6 +72,12 @@ variable "lambda_s3_key" {
   default     = "lambdas/DataHandler.zip"
 }
 
+variable "outbox_worker_s3_key" {
+  description = "S3 key for the outbox worker Lambda deployment zip"
+  type        = string
+  default     = "lambdas/OutboxWorker.zip"
+}
+
 variable "lambda_log_level" {
   description = "Lambda log level (trace, debug, info, warn, error, fatal)"
   type        = string

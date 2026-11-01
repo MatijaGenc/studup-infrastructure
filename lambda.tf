@@ -155,6 +155,29 @@ resource "aws_cloudwatch_log_group" "outbox_worker" {
   retention_in_days = 30
 }
 
+resource "aws_iam_policy" "outbox_worker_logs" {
+  name        = "studup-outbox-worker-logs"
+  description = "Allow the outbox worker Lambda to write to its CloudWatch log group"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Resource = "${aws_cloudwatch_log_group.outbox_worker.arn}:*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "outbox_worker_logs" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.outbox_worker_logs.arn
+}
+
 resource "aws_lambda_function" "outbox_worker" {
   function_name = "studup-outbox-worker"
   role          = aws_iam_role.lambda.arn
@@ -163,7 +186,7 @@ resource "aws_lambda_function" "outbox_worker" {
   memory_size   = var.lambda_memory_size
   timeout       = 60
   s3_bucket     = "studup-terraform-state"
-  s3_key        = var.lambda_s3_key
+  s3_key        = var.outbox_worker_s3_key
 
   vpc_config {
     subnet_ids         = local.subnet_ids
@@ -172,18 +195,19 @@ resource "aws_lambda_function" "outbox_worker" {
 
   environment {
     variables = {
-      APP_EMAIL_FROM_ADDRESS = var.email_from_address
-      APP_SUPPORT_EMAIL      = var.support_email
-      APP_LOG_LEVEL          = var.lambda_log_level
-      CLOUDFRONT_DOMAIN      = aws_cloudfront_distribution.studup.domain_name
-      PROFILE_IMAGES_BUCKET  = aws_s3_bucket.profile_images.id
-      CV_FILES_BUCKET        = aws_s3_bucket.cv_files.id
-      APP_DATABASE_USER      = "studup_app"
-      APP_DATABASE_HOST      = "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com"
-      APP_DATABASE_NAME      = "postgres"
-      APP_DATABASE_PORT      = "5432"
-      APP_DATABASE_SECRET_ID = aws_secretsmanager_secret.app_database_password.name
-      NODE_EXTRA_CA_CERTS    = "/var/task/global-bundle.pem"
+      APP_EMAIL_FROM_ADDRESS    = var.email_from_address
+      APP_SUPPORT_EMAIL         = var.support_email
+      APP_LOG_LEVEL             = var.lambda_log_level
+      CLOUDFRONT_DOMAIN         = aws_cloudfront_distribution.studup.domain_name
+      PROFILE_IMAGES_BUCKET     = aws_s3_bucket.profile_images.id
+      CV_FILES_BUCKET           = aws_s3_bucket.cv_files.id
+      APP_DATABASE_USER         = "studup_app"
+      APP_DATABASE_HOST         = "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com"
+      APP_DATABASE_NAME         = "postgres"
+      APP_DATABASE_PORT         = "5432"
+      APP_DATABASE_SECRET_ID    = aws_secretsmanager_secret.app_database_password.name
+      NODE_EXTRA_CA_CERTS       = "/var/task/global-bundle.pem"
+      OUTBOX_WORKER_LOG_VERSION = "1"
     }
   }
 
