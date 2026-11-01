@@ -69,6 +69,16 @@ function terraformResource(type, name) {
     return match[1]
 }
 
+function assertCorsHeaderContract(response) {
+    assert.match(response, /\$\{local\.api_cors_allowed_headers\}/, 'CORS response must use the shared header contract')
+    const definition = terraform.match(/api_cors_allowed_headers\s*=\s*"([^"]+)"/)
+    assert.ok(definition, 'missing shared CORS header contract')
+    assert.deepEqual(
+        new Set(definition[1].split(',')),
+        new Set(['Content-Type', 'Authorization', 'X-Access-Token', 'X-Client-Type', 'Idempotency-Key']),
+    )
+}
+
 test('private OPTIONS preflight is unauthenticated and advertises PATCH', () => {
     for (const api of ['dta_api', 'data_api']) {
         const method = terraformResource('aws_api_gateway_method', `${api}_preflight`)
@@ -78,8 +88,7 @@ test('private OPTIONS preflight is unauthenticated and advertises PATCH', () => 
         assert.match(response, /Access-Control-Allow-Methods[^\n]*PATCH/)
         assert.match(response, /Access-Control-Allow-Origin[^\n]*https:\/\/www\.studup\.net/)
         assert.match(response, /Access-Control-Allow-Credentials[^\n]*'true'/)
-        for (const header of ['Content-Type', 'Authorization', 'X-Access-Token'])
-            assert.match(response, new RegExp(`Access-Control-Allow-Headers[^\\n]*${header}`))
+        assertCorsHeaderContract(response)
     }
 })
 
@@ -90,6 +99,7 @@ test('gateway-generated errors carry CORS headers and deployments wait for them'
             assert.match(response, /Access-Control-Allow-Origin[^\n]*https:\/\/www\.studup\.net/)
             assert.match(response, /Access-Control-Allow-Credentials[^\n]*'true'/)
             assert.match(response, /Access-Control-Allow-Methods[^\n]*PATCH/)
+            assertCorsHeaderContract(response)
         }
     }
     for (const status of ['4xx', '5xx']) {
@@ -97,6 +107,7 @@ test('gateway-generated errors carry CORS headers and deployments wait for them'
         assert.match(response, /Access-Control-Allow-Origin[^\n]*'\*'/)
         assert.doesNotMatch(response, /Access-Control-Allow-Credentials/)
         assert.match(response, /Access-Control-Allow-Methods[^\n]*PATCH/)
+        assertCorsHeaderContract(response)
     }
     for (const api of ['dta_api', 'data_api', 'open_api']) {
         const deployment = terraformResource('aws_api_gateway_deployment', api)

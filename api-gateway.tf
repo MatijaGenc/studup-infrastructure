@@ -467,7 +467,7 @@ resource "aws_api_gateway_gateway_response" "dta_api_default_4xx" {
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
-    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'${local.api_cors_allowed_headers}'"
     "gatewayresponse.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
   }
 }
@@ -481,7 +481,7 @@ resource "aws_api_gateway_gateway_response" "dta_api_default_5xx" {
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
-    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'${local.api_cors_allowed_headers}'"
     "gatewayresponse.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
   }
 }
@@ -495,7 +495,7 @@ resource "aws_api_gateway_gateway_response" "data_api_default_4xx" {
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
-    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'${local.api_cors_allowed_headers}'"
     "gatewayresponse.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
   }
 }
@@ -509,7 +509,7 @@ resource "aws_api_gateway_gateway_response" "data_api_default_5xx" {
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "gatewayresponse.header.Access-Control-Allow-Credentials" = "'true'"
-    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Headers"     = "'${local.api_cors_allowed_headers}'"
     "gatewayresponse.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
   }
 }
@@ -522,7 +522,7 @@ resource "aws_api_gateway_gateway_response" "open_api_default_4xx" {
   }
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
-    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'${local.api_cors_allowed_headers}'"
     "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
   }
 }
@@ -535,7 +535,7 @@ resource "aws_api_gateway_gateway_response" "open_api_default_5xx" {
   }
   response_parameters = {
     "gatewayresponse.header.Access-Control-Allow-Origin"  = "'*'"
-    "gatewayresponse.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization,X-Access-Token'"
+    "gatewayresponse.header.Access-Control-Allow-Headers" = "'${local.api_cors_allowed_headers}'"
     "gatewayresponse.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
   }
 }
@@ -663,6 +663,9 @@ resource "aws_lambda_permission" "open_api_rest_proxy" {
 }
 
 locals {
+  # Keep gateway responses aligned with the web/mobile request header contract.
+  api_cors_allowed_headers = "Content-Type,Authorization,X-Access-Token,X-Client-Type,Idempotency-Key"
+
   dta_api_preflight_resources = {
     root  = aws_api_gateway_rest_api.dta_api.root_resource_id
     data  = aws_api_gateway_resource.dta_api_data.id
@@ -719,7 +722,7 @@ resource "aws_api_gateway_integration_response" "dta_api_preflight" {
     "method.response.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "method.response.header.Access-Control-Allow-Credentials" = "'true'"
     "method.response.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "method.response.header.Access-Control-Allow-Headers"     = "'${local.api_cors_allowed_headers}'"
   }
 }
 
@@ -767,7 +770,7 @@ resource "aws_api_gateway_integration_response" "data_api_preflight" {
     "method.response.header.Access-Control-Allow-Origin"      = "'https://www.studup.net'"
     "method.response.header.Access-Control-Allow-Credentials" = "'true'"
     "method.response.header.Access-Control-Allow-Methods"     = "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Headers"     = "'Content-Type,Authorization,X-Access-Token'"
+    "method.response.header.Access-Control-Allow-Headers"     = "'${local.api_cors_allowed_headers}'"
   }
 }
 
