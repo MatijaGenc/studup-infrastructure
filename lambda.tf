@@ -113,7 +113,7 @@ resource "aws_lambda_function" "data_handler" {
   function_name = "DataHandler"
   role          = aws_iam_role.lambda.arn
   handler       = "index.handler"
-  runtime       = "nodejs24.x" # actual deployed: nodejs26.x (outdated provider enum, updated via CLI)
+  runtime       = "nodejs26.x"
   memory_size   = var.lambda_memory_size
   timeout       = var.lambda_timeout
   s3_bucket     = "studup-terraform-state"
@@ -143,7 +143,6 @@ resource "aws_lambda_function" "data_handler" {
 
   lifecycle {
     ignore_changes = [
-      runtime,
       s3_key,
       s3_bucket,
     ]
@@ -182,7 +181,7 @@ resource "aws_lambda_function" "outbox_worker" {
   function_name = "studup-outbox-worker"
   role          = aws_iam_role.lambda.arn
   handler       = "outboxWorker.handler"
-  runtime       = "nodejs24.x" # actual deployed: nodejs26.x (outdated provider enum, updated via CLI)
+  runtime       = "nodejs26.x"
   memory_size   = var.lambda_memory_size
   timeout       = 60
   s3_bucket     = "studup-terraform-state"
@@ -215,7 +214,6 @@ resource "aws_lambda_function" "outbox_worker" {
 
   lifecycle {
     ignore_changes = [
-      runtime,
       s3_key,
       s3_bucket,
     ]
