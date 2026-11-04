@@ -2,6 +2,10 @@
 
 Terraform-managed AWS infrastructure for the StudUp platform.
 
+> Platform-wide entry documentation — project map, package managers, API boundary,
+> synthetic testing, quality gates and current limitations — is in
+> [docs/PROJECT.md](docs/PROJECT.md).
+
 ## Resources Managed
 
 | Service | Resource | Region |
