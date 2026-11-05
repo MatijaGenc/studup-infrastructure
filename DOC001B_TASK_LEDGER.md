@@ -40,7 +40,7 @@ Not committed, pushed or deployed. Branch: `DOC-001-B-task-ledger`, created from
 
 ## Proof
 
-- Published source SHA-256:
+- Initial implementation snapshot source SHA-256 (later snapshots record their own digest in the generated header):
   `6dfee35e3b117296d85185c9c1cdc2029f4a1d3b1cf8aa611f09ba104b0c4915`.
 - Source checkboxes preserved (165 open, 390 checked); no `/Users/` path remains;
   zero non-remote Markdown links remain; zero broken relative links; source and output
