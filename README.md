@@ -5,6 +5,10 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 > Platform-wide entry documentation — project map, package managers, API boundary,
 > synthetic testing, quality gates and current limitations — is in
 > [docs/PROJECT.md](docs/PROJECT.md).
+>
+> The canonical, versioned task ledger is [docs/chatgpt-tasks.md](docs/chatgpt-tasks.md).
+> It is generated one-way from the local workspace master; see
+> [task ledger publication](docs/PROJECT.md#task-ledger-publication).
 
 ## Resources Managed
 

@@ -30,6 +30,40 @@ compiled JavaScript; it is a contracts package, not a native module.
   `.terraform/` directory is only provider/schema cache and does not prove what is
   deployed.
 
+## Task ledger publication
+
+The canonical published task ledger is [chatgpt-tasks.md](chatgpt-tasks.md). It is a
+versioned snapshot generated one-way from the local master working copy
+`<workspace>/chatgpt-tasks.md`, which lives outside this repository and remains the
+editable source. The publishing command never writes to or replaces the source.
+
+Published Git snapshot versus local working copy:
+
+- The Git snapshot is the reviewed, canonical published status. Its generated header
+  records the source SHA-256 and publication date.
+- The local working copy may be newer while work is in progress. A status, checkbox or
+  evidence link in the local copy is not published or verified until it is reflected
+  in a reviewed snapshot.
+- Local evidence paths appear as `<workspace>/...` and are not included in this
+  repository. They are clearly marked local/unavailable and are not remote proof.
+  Remote links, CI runs and deployment records are proof only for the exact commits
+  they name.
+
+Regenerate the snapshot after a verified delivery:
+
+```bash
+npm run publish:tasks
+npm run publish:tasks -- /path/to/chatgpt-tasks.md
+```
+
+With no argument the command reads `../chatgpt-tasks.md` from this repository, which is
+the workspace-root master. It refuses to overwrite the source, refuses
+`complete-tasks.md`, environment files and logs, normalizes workspace absolute paths
+to portable `<workspace>/...` labels, converts unavailable local evidence to labelled
+plain text rather than broken relative links, and fails closed without printing values
+if credential-like content is detected. Review the generated diff, run `npm run check`,
+and publish it through the normal branch/PR process. Do not hand-edit the snapshot.
+
 ## Setup and package manager versions
 
 Per-repository, from the committed lockfiles:
@@ -121,10 +155,12 @@ authorize resetting or baselining production.
 
 ## Known limitations (DOC-001 gap)
 
-- Master tracking files `chatgpt-tasks.md` and the latest reconciliation report
-  `recheck-report-2026-11-04.md` are currently local workspace files **outside Git**;
-  they are not published in any repository. They are referenced here as a workspace
-  convention, not as a claim that they are version-controlled.
+- The editable task-ledger master and the latest reconciliation report
+  `recheck-report-2026-11-04.md` remain local workspace files **outside Git**. The
+  task ledger is published as a reviewed, generated snapshot in
+  [chatgpt-tasks.md](chatgpt-tasks.md); the local master is not itself versioned, and
+  the reconciliation report is not published in any repository. Local-only evidence
+  is not remote proof.
 - This documentation records checked-in commands and configuration only. It does not
   assert verified deployed state, a legal operator, data retention terms, code-signing
   identity, or proven rollback. Those remain open items.
