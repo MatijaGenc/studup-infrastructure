@@ -127,11 +127,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cv_files" {
   }
 }
 
+# CV files are private. The DataHandler Lambda reads them with its scoped IAM
+# role. CloudFront has no signed-URL/key-group check on cv/*, so it must not be
+# allowed to read this bucket (the unsigned cv/* route is expected to return 403).
 resource "aws_s3_bucket_public_access_block" "cv_files" {
   bucket                  = aws_s3_bucket.cv_files.id
   block_public_acls       = true
   ignore_public_acls      = true
-  block_public_policy     = false
+  block_public_policy     = true
   restrict_public_buckets = true
 }
 
@@ -145,24 +148,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "cv_files" {
       noncurrent_days = 30
     }
   }
-}
-
-resource "aws_s3_bucket_policy" "cv_files_cloudfront" {
-  bucket = aws_s3_bucket.cv_files.id
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowCloudFrontOAI"
-        Effect = "Allow"
-        Principal = {
-          AWS = aws_cloudfront_origin_access_identity.cv_files.iam_arn
-        }
-        Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.cv_files.arn}/*"
-      }
-    ]
-  })
 }
 
 resource "aws_s3_bucket" "root_redirect" {
