@@ -1,2 +1,9 @@
-ruff==0.17.3
+# Python 3.12 quality environment, including transitive dependencies.
+# Keep the set aligned with the license metadata inventory.
+ast-serialize==0.13.1
+librt==0.16.0
 mypy==2.4.1
+mypy-extensions==1.1.0
+pathspec==1.1.1
+ruff==0.17.3
+typing-extensions==4.16.0

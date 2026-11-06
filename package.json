@@ -2,10 +2,10 @@
     "name": "studup-infrastructure-quality",
     "private": true,
     "scripts": {
-        "test:gates": "node --test scripts/quality-self-test.cjs scripts/spa-routing.test.cjs scripts/publish-chatgpt-tasks.test.cjs scripts/cv-private-policy.test.cjs scripts/check-project-docs.test.cjs",
+        "test:gates": "node --test scripts/quality-self-test.cjs scripts/spa-routing.test.cjs scripts/publish-chatgpt-tasks.test.cjs scripts/cv-private-policy.test.cjs scripts/check-project-docs.test.cjs scripts/dependency-license-inventory.test.cjs scripts/check-dependency-licenses.test.cjs",
         "check": "node scripts/check.cjs",
         "publish:tasks": "node scripts/publish-chatgpt-tasks.cjs",
-        "typecheck": "npm --prefix authorizer run typecheck && .venv-quality/bin/mypy --check-untyped-defs --ignore-missing-imports rotation-function/rotate.py scripts/package-python.py",
+        "typecheck": "npm --prefix authorizer run typecheck && .venv-quality/bin/mypy --check-untyped-defs --ignore-missing-imports rotation-function/rotate.py scripts/package-python.py scripts/check-python-licenses.py",
         "format:check": "terraform fmt -check -recursive && biome format . && .venv-quality/bin/ruff format --check rotation-function scripts",
         "lint": "biome check . && .venv-quality/bin/ruff check rotation-function scripts",
         "build:placeholder": "python3 scripts/package-python.py migration-runner migration-runner-placeholder.zip",
@@ -15,7 +15,9 @@
         "prepare": "node scripts/install-hooks.cjs",
         "validate:terraform": "terraform validate",
         "test:live-cors": "node scripts/check-live-cors.mjs",
-        "check:docs": "node scripts/check-project-docs.cjs"
+        "check:docs": "node scripts/check-project-docs.cjs",
+        "licenses:check": "node scripts/check-dependency-licenses.cjs && cd authorizer && node ../scripts/check-dependency-licenses.cjs",
+        "licenses:python:check": ".venv-quality/bin/python3 scripts/check-python-licenses.py"
     },
     "qualityGates": {
         "manager": "npm",
@@ -24,7 +26,9 @@
             "format:check",
             "lint",
             "check:docs",
+            "licenses:check",
             "build",
+            "licenses:python:check",
             "validate:terraform",
             "test:quality"
         ]

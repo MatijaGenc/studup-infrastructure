@@ -29,3 +29,7 @@ The first remote quality workflow failed Terraform validation because the Linux 
 All ZIPs are ignored rather than committed. `npm run build` creates `authorizer.zip`, `rotation-function.zip`, and `migration-runner-placeholder.zip` from tracked source and lockfiles; successful validation CI publishes them as the `lambda-packages` artifact. The Python packager writes to a temporary file and replaces the destination only after success. It rejects missing/empty sources and symlinks, normalizes timestamps and file modes, and never reuses stale entries. Tests use disposable files rather than live AWS.
 
 The migration bootstrap handler throws `not packaged`; it cannot execute migrations. Its source and CA bundle already existed under `migration-runner/`. No Terraform resource, access policy, deployment or production state changes are included in this generated-artifact cleanup. Local archives were backed up before index-only removal. Review and rebuild packages as part of any separately authorized release.
+
+## Dependency license metadata
+
+`licenses:check` runs in the mandatory chain before build. See [DEPENDENCY_LICENSES.md](DEPENDENCY_LICENSES.md) for scope, drift failures and explicitly unresolved findings. Passing metadata checks does not settle legal or distribution obligations.

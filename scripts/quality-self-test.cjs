@@ -13,7 +13,7 @@ for (const failingGate of ['typecheck', 'lint', 'build', 'test']) {
             const commands = names.map((name) => [
                 process.execPath,
                 '-e',
-                `require('node:fs').appendFileSync(${JSON.stringify(log)}, ${JSON.stringify(name + '\n')}); process.exit(${name === failingGate ? 23 : 0})`,
+                `require('node:fs').appendFileSync(${JSON.stringify(log)}, ${JSON.stringify(`${name}\n`)}); process.exit(${name === failingGate ? 23 : 0})`,
             ])
             assert.equal(runGateChain(commands, dir), 23)
             assert.deepEqual(readFileSync(log, 'utf8').trim().split('\n'), names.slice(0, names.indexOf(failingGate) + 1))
@@ -66,7 +66,7 @@ for (const deletion of [false, true]) {
     })
 }
 
-for (const gate of ['check:docs', 'validate:terraform']) {
+for (const gate of ['check:docs', 'validate:terraform', 'licenses:python:check']) {
     for (const omission of ['script', 'chain']) {
         test(`mandatory ${gate} cannot be disabled through the ${omission}`, () => {
             const dir = mkdtempSync(join(tmpdir(), 'studup-required-gate-'))
@@ -81,4 +81,19 @@ for (const gate of ['check:docs', 'validate:terraform']) {
             }
         })
     }
+}
+
+for (const omission of ['script', 'chain']) {
+    test(`license metadata gate cannot be removed from the ${omission}`, () => {
+        const dir = mkdtempSync(join(tmpdir(), 'studup-license-gate-'))
+        try {
+            const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'))
+            if (omission === 'script') delete pkg.scripts['licenses:check']
+            else pkg.qualityGates.gates = pkg.qualityGates.gates.filter((name) => name !== 'licenses:check')
+            writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg))
+            assert.throws(() => loadCommands(dir), /Required quality gate missing: licenses:check/)
+        } finally {
+            rmSync(dir, { recursive: true, force: true })
+        }
+    })
 }
