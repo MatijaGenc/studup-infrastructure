@@ -1,0 +1,33 @@
+# Mobile TODO reconciliation
+
+Status: dated 2026-11-06. Source: mobile `TODO.md` at source commit `9b20b48` (23 lines,
+legacy "Backlog"/"Next" index, archived as `docs/archive/TODO-2026-11-06.md` in the mobile repository). This file does not turn
+the old list into completion evidence. The canonical task ledger is
+[chatgpt-tasks.md](chatgpt-tasks.md); where a primary ID is known it is named, otherwise
+the item stays open with no invented ID. No old checkbox is asserted as done.
+
+| # | Legacy TODO item (verbatim intent) | Current proof or open state |
+|---|-----------------------------------|-----------------------------|
+| 1 | Change hourly to 5.25 | **Owner-policy open (BE-005 / LEGAL-003).** This historical value is not a current wage-policy decision. Do not introduce a hardcoded legal minimum without confirming the applicable rule. |
+| 2 | Set yarn version to 4 in Expo pipeline | **Partially implemented (REL-002 / MOB-006).** `mobile/package.json` declares `packageManager: yarn@4.18.0` and Node `>=26`; local install/setup is documented. Remote EAS pipeline behavior is not verified from this checkout. |
+| 3 | Turn on auto versioning from Expo | **Config implemented, runtime unverified (MOB-006).** `mobile/eas.json` sets `appVersionSource: "remote"` and production `autoIncrement: true`. No EAS build/store result proves it. |
+| 4 | Remove the 2 MB image limitation | **Superseded/partial.** `mobile/components/common/profile-image.tsx` enforces a `MAX_PROFILE_IMAGE_SIZE_BYTES` limit (5 MB message). The request to remove the cap is not done; oversized-image handling remains open under MOB-005. |
+| 5 | Extract form control as a reused component | **Implemented (MOB-001).** `mobile/components/common/stud-app-input.tsx` plus `mobile/components/auth-forms/*` and `mobile/__tests__/input-contract.test.tsx` show a shared input path. Broader form-control consolidation is not claimed complete. |
+| 6 | Why are all REST calls POST? | **Original all-POST defect resolved (API-003).** `shared/api.ts` dispatches typed GET/POST/PATCH/DELETE requests; `__tests__/api-contract.test.ts` proves GET listing, PATCH updates and DELETE transport. A documented legacy complaint-create adapter remains POST, which is appropriate for a creation action. |
+| 7 | Make the 2FA register code numbers-only | **Open (MOB-013 / SEC-003).** `components/screens/auth/registration-verification-screen.tsx` validates six characters and still shows an alphanumeric placeholder; it does not enforce digits. This is email registration verification, not a claim of MFA. |
+| 8 | Handle errors with `htsAlert` | **Implemented path exists.** `mobile/shared/utils.tsx` defines `htsAlert`, used by auth forms and screens. Error UX/consistency acceptance is not proven; open UX work remains (MOB-004). |
+| 9 | Comb through for `any` types | **Open (TEST-005 / DEP-003).** Typecheck scripts exist (`typecheck`, `typecheck:test`, `typecheck:notifications`) but no checked-in zero-`any` audit/result proves the cleanup. Do not mark done from a passing typecheck alone. |
+| 10 | Replace `react-native-switch-selector` | **Implemented/superseded (MOB-001 / DEP-002).** The dependency is absent from `mobile/package.json`; `mobile/components/Dropdown/Dropdown.tsx` uses `react-native-element-dropdown`. |
+| 11 | Better-looking alerts | **Partial (MOB-001 / MOB-004 / ALERT-003).** Native input/alert/navigation improvements have dated evidence, but complete dialog/error and notification-delivery acceptance remains open; subjective styling is not marked finished. |
+| 12 | Create dropdown with `@react-native-picker/picker` | **Implemented differently (MOB-001 / MOB-009).** `@react-native-picker/picker` is not a dependency; the checked-in `Dropdown` wraps `react-native-element-dropdown` with themed props. The exact library request is superseded; no new requirement is implied. |
+| 13 | Handle safe-area restrictions | **Partial.** `App.tsx` wires `SafeAreaProvider`/`SafeAreaView`; `components/common/modal-frame.tsx` and auth screens use safe-area insets. MOB-002 keyboard/safe-area and both-platform criteria remain open. |
+| 14 | Share Zod stuff nicely | **Implemented/validated contract path.** `mobile/package.json` pins `@studup/shared` at `112e97841e8ced62e9a5dd843834fba988c89743`; `shared/api.ts` and `shared/validation.ts` consume it. This is the DEP-001/API-001 shared-contract path, not proof of every screen. |
+| 15 | Merge API into one thing | **Implemented (API-003 / MOB-008).** `mobile/shared/api.ts` is the central API module with scoped auth/data transports; the old Appsync/dead API path is absent. Live provider behavior is separate and unverified. |
+| 16 | Make dropdown API nicer | **Open (MOB-001 / MOB-013).** `components/Dropdown/Dropdown.types.ts` provides typed props, but no acceptance review proves the API is "nicer" or stable. Keep as refactor backlog. |
+| 17 | Root wrapper should be scrollable, not inner content | **Open.** No checked-in layout proof/test for this wrapper behavior was found. Remains under MOB-002 scroll/keyboard work. |
+| 18 | Add back buttons to auth flow | **Implemented (MOB-001 / MOB-002).** `mobile/components/common/auth-back-button.tsx` provides an accessible back control calling `navigation.goBack()`, used by the auth flow. |
+
+## Next
+
+The legacy `# Next` heading contains no actionable items. Superseded by the canonical
+ledger and the open rows above; this reconciliation is an index, not a status ledger.

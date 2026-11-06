@@ -65,3 +65,20 @@ for (const deletion of [false, true]) {
         }
     })
 }
+
+for (const gate of ['check:docs', 'validate:terraform']) {
+    for (const omission of ['script', 'chain']) {
+        test(`mandatory ${gate} cannot be disabled through the ${omission}`, () => {
+            const dir = mkdtempSync(join(tmpdir(), 'studup-required-gate-'))
+            try {
+                const pkg = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'))
+                if (omission === 'script') delete pkg.scripts[gate]
+                else pkg.qualityGates.gates = pkg.qualityGates.gates.filter((name) => name !== gate)
+                writeFileSync(join(dir, 'package.json'), JSON.stringify(pkg))
+                assert.throws(() => loadCommands(dir), new RegExp(`Required quality gate missing: ${gate}`))
+            } finally {
+                rmSync(dir, { recursive: true, force: true })
+            }
+        })
+    }
+}

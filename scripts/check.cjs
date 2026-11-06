@@ -2,7 +2,7 @@ const { spawnSync } = require('node:child_process')
 const { readFileSync } = require('node:fs')
 const { join } = require('node:path')
 
-const required = ['typecheck', 'format:check', 'lint', 'build', 'test:quality']
+const required = ['typecheck', 'format:check', 'lint', 'check:docs', 'build', 'validate:terraform', 'test:quality']
 function runGateChain(commands, cwd, spawn = spawnSync) {
     for (const [command, ...args] of commands) {
         const result = spawn(command, args, { cwd, stdio: 'inherit', shell: false })

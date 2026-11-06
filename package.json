@@ -2,7 +2,7 @@
     "name": "studup-infrastructure-quality",
     "private": true,
     "scripts": {
-        "test:gates": "node --test scripts/quality-self-test.cjs scripts/spa-routing.test.cjs scripts/publish-chatgpt-tasks.test.cjs scripts/cv-private-policy.test.cjs",
+        "test:gates": "node --test scripts/quality-self-test.cjs scripts/spa-routing.test.cjs scripts/publish-chatgpt-tasks.test.cjs scripts/cv-private-policy.test.cjs scripts/check-project-docs.test.cjs",
         "check": "node scripts/check.cjs",
         "publish:tasks": "node scripts/publish-chatgpt-tasks.cjs",
         "typecheck": "npm --prefix authorizer run typecheck && .venv-quality/bin/mypy --check-untyped-defs --ignore-missing-imports rotation-function/rotate.py scripts/package-python.py",
@@ -13,7 +13,8 @@
         "test:quality": "npm test && npm run test:gates",
         "prepare": "node scripts/install-hooks.cjs",
         "validate:terraform": "terraform validate",
-        "test:live-cors": "node scripts/check-live-cors.mjs"
+        "test:live-cors": "node scripts/check-live-cors.mjs",
+        "check:docs": "node scripts/check-project-docs.cjs"
     },
     "qualityGates": {
         "manager": "npm",
@@ -21,6 +22,7 @@
             "typecheck",
             "format:check",
             "lint",
+            "check:docs",
             "build",
             "validate:terraform",
             "test:quality"
