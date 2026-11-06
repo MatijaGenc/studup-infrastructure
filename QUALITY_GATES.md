@@ -18,8 +18,14 @@ Build creates fresh Lambda ZIPs from hash-locked Python 3.12 runtime wheels (inc
 
 Terraform resource/provider changes additionally need a reviewed plan against the intended environment before apply. Tooling-only changes need validation and package tests; production plan/apply is inapplicable if no resource configuration changed. Native/mobile checks are inapplicable here. No quality command deploys resources. Package/runtime behavior changes need relevant compatibility and deployment verification separately.
 
-Terraform semantic validation runs after package build because resource source hashes read the generated ZIP files. A clean checkout must build real archives before validating; placeholder ZIPs are not a valid substitute.
+Terraform semantic validation runs after package build because resource source hashes read the generated ZIP files. A clean checkout must rebuild the authorizer and rotation runtime archives before validating. The migration runner has a deliberately non-executable bootstrap handler: its ZIP is rebuilt from tracked `migration-runner/` source and must be replaced by the backend migration build before an actual migration invocation. It is not a substitute for either runtime archive.
 
 ## S-110 — Linux provider lock verification (29 October 2026)
 
 The first remote quality workflow failed Terraform validation because the Linux AWS provider package lacked a matching h1 checksum in the committed lockfile. `terraform providers lock -platform=linux_amd64 -platform=darwin_arm64` obtained signed provider checksums without changing provider versions or infrastructure resources. The additional Linux checksum is committed; validation uses a fresh Linux Terraform data directory with `init -backend=false -lockfile=readonly`. No plan/apply or production deployment is part of this correction.
+
+## Generated ZIP policy
+
+All ZIPs are ignored rather than committed. `npm run build` creates `authorizer.zip`, `rotation-function.zip`, and `migration-runner-placeholder.zip` from tracked source and lockfiles; successful validation CI publishes them as the `lambda-packages` artifact. The Python packager writes to a temporary file and replaces the destination only after success. It rejects missing/empty sources and symlinks, normalizes timestamps and file modes, and never reuses stale entries. Tests use disposable files rather than live AWS.
+
+The migration bootstrap handler throws `not packaged`; it cannot execute migrations. Its source and CA bundle already existed under `migration-runner/`. No Terraform resource, access policy, deployment or production state changes are included in this generated-artifact cleanup. Local archives were backed up before index-only removal. Review and rebuild packages as part of any separately authorized release.

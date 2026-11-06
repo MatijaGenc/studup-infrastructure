@@ -1,7 +1,6 @@
 *.tfvars
 .terraform/
 *.zip
-!migration-runner-placeholder.zip
 rotation-function/build/
 authorizer/node_modules/
 graphify-out/
