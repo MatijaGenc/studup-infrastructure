@@ -64,7 +64,7 @@ resource "aws_cloudfront_distribution" "studup" {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     compress               = true
-    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    cache_policy_id        = aws_cloudfront_cache_policy.profile_images.id
   }
 
   ordered_cache_behavior {
@@ -119,6 +119,37 @@ resource "aws_cloudfront_distribution" "studup" {
 
 resource "aws_cloudfront_origin_access_identity" "profile_images" {
   comment = "OAI for stud-up-profile-images bucket"
+}
+
+# Avatars use a versioned object key plus a `?v=<version>` query. Both parts are
+# cache identities: the path changes on replacement, and forwarding `v` keeps
+# legacy/stable-key URLs from sharing a cached object across versions.
+resource "aws_cloudfront_cache_policy" "profile_images" {
+  name        = "studup-profile-images-cache"
+  comment     = "Cache avatars by path and the v= version query; forward v to S3"
+  default_ttl = 86400
+  max_ttl     = 31536000
+  min_ttl     = 0
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    enable_accept_encoding_brotli = true
+    enable_accept_encoding_gzip   = true
+
+    cookies_config {
+      cookie_behavior = "none"
+    }
+
+    headers_config {
+      header_behavior = "none"
+    }
+
+    query_strings_config {
+      query_string_behavior = "whitelist"
+      query_strings {
+        items = ["v"]
+      }
+    }
+  }
 }
 
 resource "aws_cloudfront_origin_access_identity" "cv_files" {
