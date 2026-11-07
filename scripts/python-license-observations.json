@@ -1,110 +1,110 @@
 {
-  "quality": {
-    "existingReviewItems": [
-      {
-        "license": "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
-        "name": "pathspec",
-        "reason": "Existing declaration requires notice/distribution obligation review before release; metadata recording is not legal approval.",
-        "status": "unresolved",
-        "version": "1.1.1"
-      }
-    ],
-    "recordedLicenseDeclarations": [
-      {
-        "license": "MIT",
-        "name": "ast_serialize",
-        "version": "0.13.1"
-      },
-      {
-        "license": "MIT",
-        "name": "librt",
-        "version": "0.16.0"
-      },
-      {
-        "license": "MIT",
-        "name": "mypy",
-        "version": "2.4.1"
-      },
-      {
-        "license": "MIT",
-        "name": "mypy_extensions",
-        "version": "1.1.0"
-      },
-      {
-        "license": "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
-        "name": "pathspec",
-        "version": "1.1.1"
-      },
-      {
-        "license": "MIT",
-        "name": "ruff",
-        "version": "0.17.3"
-      },
-      {
-        "license": "PSF-2.0",
-        "name": "typing_extensions",
-        "version": "4.16.0"
-      },
-      {
-        "license": "MIT",
-        "name": "mypy_extensions",
-        "version": "1.2.0"
-      }
-    ]
-  },
-  "rotation": {
-    "existingReviewItems": [],
-    "recordedLicenseDeclarations": [
-      {
-        "license": "License :: OSI Approved :: MIT License",
-        "name": "asn1crypto",
-        "version": "1.5.1"
-      },
-      {
-        "license": "Apache-2.0",
-        "name": "boto3",
-        "version": "1.43.123"
-      },
-      {
-        "license": "Apache-2.0",
-        "name": "botocore",
-        "version": "1.43.123"
-      },
-      {
-        "license": "License :: OSI Approved :: MIT License",
-        "name": "jmespath",
-        "version": "1.1.0"
-      },
-      {
-        "license": "License :: OSI Approved :: BSD License",
-        "name": "pg8000",
-        "version": "1.31.6"
-      },
-      {
-        "license": "License :: OSI Approved :: Apache Software License | License :: OSI Approved :: BSD License",
-        "name": "python-dateutil",
-        "version": "2.9.0.post0"
-      },
-      {
-        "license": "License :: OSI Approved :: Apache Software License",
-        "name": "s3transfer",
-        "version": "0.19.3"
-      },
-      {
-        "license": "MIT-0",
-        "name": "scramp",
-        "version": "1.5.0"
-      },
-      {
-        "license": "License :: OSI Approved :: MIT License",
-        "name": "six",
-        "version": "1.17.0"
-      },
-      {
-        "license": "MIT",
-        "name": "urllib3",
-        "version": "2.8.0"
-      }
-    ]
-  }
+    "quality": {
+        "existingReviewItems": [
+            {
+                "license": "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+                "name": "pathspec",
+                "reason": "Existing declaration requires notice/distribution obligation review before release; metadata recording is not legal approval.",
+                "status": "unresolved",
+                "version": "1.1.1"
+            }
+        ],
+        "recordedLicenseDeclarations": [
+            {
+                "license": "MIT",
+                "name": "ast_serialize",
+                "version": "0.13.1"
+            },
+            {
+                "license": "MIT",
+                "name": "librt",
+                "version": "0.16.0"
+            },
+            {
+                "license": "MIT",
+                "name": "mypy",
+                "version": "2.4.1"
+            },
+            {
+                "license": "MIT",
+                "name": "mypy_extensions",
+                "version": "1.1.0"
+            },
+            {
+                "license": "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+                "name": "pathspec",
+                "version": "1.1.1"
+            },
+            {
+                "license": "MIT",
+                "name": "ruff",
+                "version": "0.17.3"
+            },
+            {
+                "license": "PSF-2.0",
+                "name": "typing_extensions",
+                "version": "4.16.0"
+            },
+            {
+                "license": "MIT",
+                "name": "mypy_extensions",
+                "version": "1.2.0"
+            }
+        ]
+    },
+    "rotation": {
+        "existingReviewItems": [],
+        "recordedLicenseDeclarations": [
+            {
+                "license": "License :: OSI Approved :: MIT License",
+                "name": "asn1crypto",
+                "version": "1.5.1"
+            },
+            {
+                "license": "Apache-2.0",
+                "name": "boto3",
+                "version": "1.43.123"
+            },
+            {
+                "license": "Apache-2.0",
+                "name": "botocore",
+                "version": "1.43.123"
+            },
+            {
+                "license": "License :: OSI Approved :: MIT License",
+                "name": "jmespath",
+                "version": "1.1.0"
+            },
+            {
+                "license": "License :: OSI Approved :: BSD License",
+                "name": "pg8000",
+                "version": "1.31.6"
+            },
+            {
+                "license": "License :: OSI Approved :: Apache Software License | License :: OSI Approved :: BSD License",
+                "name": "python-dateutil",
+                "version": "2.9.0.post0"
+            },
+            {
+                "license": "License :: OSI Approved :: Apache Software License",
+                "name": "s3transfer",
+                "version": "0.19.3"
+            },
+            {
+                "license": "MIT-0",
+                "name": "scramp",
+                "version": "1.5.0"
+            },
+            {
+                "license": "License :: OSI Approved :: MIT License",
+                "name": "six",
+                "version": "1.17.0"
+            },
+            {
+                "license": "MIT",
+                "name": "urllib3",
+                "version": "2.8.0"
+            }
+        ]
+    }
 }
