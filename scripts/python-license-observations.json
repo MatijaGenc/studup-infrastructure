@@ -44,6 +44,11 @@
                 "license": "PSF-2.0",
                 "name": "typing_extensions",
                 "version": "4.16.0"
+            },
+            {
+                "license": "MIT",
+                "name": "mypy_extensions",
+                "version": "1.2.0"
             }
         ]
     },
