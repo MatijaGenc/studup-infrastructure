@@ -5,14 +5,14 @@ Scope: configuration only. No dependency installs, version updates, Terraform/re
 
 ## Inspected manifests and existing automation
 
-| Ecosystem | Directory | Manifest(s) found |
-| --- | --- | --- |
-| npm | `/` | `package.json`, `package-lock.json` |
-| npm | `/authorizer` | `authorizer/package.json`, `authorizer/package-lock.json` |
-| pip | `/` | `requirements-quality.txt` |
-| pip | `/rotation-function` | `rotation-function/requirements.txt` (hash-pinned) |
-| terraform | `/` | root `*.tf`, `.terraform.lock.hcl` |
-| github-actions | `/` | `.github/workflows/validate.yml` (SHA-pinned actions) |
+| Ecosystem      | Directory            | Manifest(s) found                                         |
+| -------------- | -------------------- | --------------------------------------------------------- |
+| npm            | `/`                  | `package.json`, `package-lock.json`                       |
+| npm            | `/authorizer`        | `authorizer/package.json`, `authorizer/package-lock.json` |
+| pip            | `/`                  | `requirements-quality.txt`                                |
+| pip            | `/rotation-function` | `rotation-function/requirements.txt` (hash-pinned)        |
+| terraform      | `/`                  | root `*.tf`, `.terraform.lock.hcl`                        |
+| github-actions | `/`                  | `.github/workflows/validate.yml` (SHA-pinned actions)     |
 
 No prior `.github/dependabot.yml`, Renovate config, or other dependency bot existed, so there is no bot conflict.
 

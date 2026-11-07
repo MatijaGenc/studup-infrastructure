@@ -8,13 +8,13 @@ names.
 
 ## Project map
 
-| Area | GitHub repository | Local checkout | Stack | Package manager |
-|------|-------------------|----------------|-------|-----------------|
-| Web | [MatijaGenc/student-employer-frontend](https://github.com/MatijaGenc/student-employer-frontend) | `recheck-2026-11-01/web` | React 19 + Vite 8, TypeScript, MUI, Zustand | yarn 4.18.0 |
-| Backend | [MatijaGenc/student-employer-backend](https://github.com/MatijaGenc/student-employer-backend) | `recheck-2026-11-01/backend` | AWS Lambda handler + Prisma 7 + PostgreSQL, TypeScript | pnpm 10.0.0 |
-| Mobile | [MatijaGenc/student-employer-mobile](https://github.com/MatijaGenc/student-employer-mobile) | `recheck-2026-11-01/mobile` | Expo SDK 58 + React Native 0.88.1, TypeScript | yarn 4.18.0 |
-| Shared | [MatijaGenc/studup-shared](https://github.com/MatijaGenc/studup-shared) (`@studup/shared`) | `studup-shared-release-build` | Zod contracts, enums and types (compiled JS) | yarn 4.18.0 |
-| Infrastructure | this repository | `.` | Terraform-managed AWS (S3, CloudFront, Lambda, API Gateway, RDS, WAF, Secrets Manager) | npm (lockfile v3) |
+| Area           | GitHub repository                                                                               | Local checkout                | Stack                                                                                  | Package manager   |
+| -------------- | ----------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------- | ----------------- |
+| Web            | [MatijaGenc/student-employer-frontend](https://github.com/MatijaGenc/student-employer-frontend) | `recheck-2026-11-01/web`      | React 19 + Vite 8, TypeScript, MUI, Zustand                                            | yarn 4.18.0       |
+| Backend        | [MatijaGenc/student-employer-backend](https://github.com/MatijaGenc/student-employer-backend)   | `recheck-2026-11-01/backend`  | AWS Lambda handler + Prisma 7 + PostgreSQL, TypeScript                                 | pnpm 10.0.0       |
+| Mobile         | [MatijaGenc/student-employer-mobile](https://github.com/MatijaGenc/student-employer-mobile)     | `recheck-2026-11-01/mobile`   | Expo SDK 58 + React Native 0.88.1, TypeScript                                          | yarn 4.18.0       |
+| Shared         | [MatijaGenc/studup-shared](https://github.com/MatijaGenc/studup-shared) (`@studup/shared`)      | `studup-shared-release-build` | Zod contracts, enums and types (compiled JS)                                           | yarn 4.18.0       |
+| Infrastructure | this repository                                                                                 | `.`                           | Terraform-managed AWS (S3, CloudFront, Lambda, API Gateway, RDS, WAF, Secrets Manager) | npm (lockfile v3) |
 
 Web, backend and mobile declare Node `>=26`; all three pin the same
 `@studup/shared` revision in their `package.json`
@@ -33,13 +33,13 @@ Web, backend and mobile declare Node `>=26`; all three pin the same
 ## Task ledger publication
 
 The editable task-ledger master is `<workspace>/chatgpt-tasks.md`, outside Git. The
-  canonical published snapshot is [chatgpt-tasks.md](chatgpt-tasks.md), generated
-  one-way by `npm run publish:tasks`. Local checkboxes are not remote proof. The
-  publisher refuses to overwrite its source, refuses `complete-tasks.md`, environment
-  files and logs, normalizes absolute workspace paths, labels unavailable local
-  evidence, and fails closed on credential-like content without printing values.
-  Publishing means: review the diff, run `npm run check`, then use the reviewed task-branch/main
-  workflow.
+canonical published snapshot is [chatgpt-tasks.md](chatgpt-tasks.md), generated
+one-way by `npm run publish:tasks`. Local checkboxes are not remote proof. The
+publisher refuses to overwrite its source, refuses `complete-tasks.md`, environment
+files and logs, normalizes absolute workspace paths, labels unavailable local
+evidence, and fails closed on credential-like content without printing values.
+Publishing means: review the diff, run `npm run check`, then use the reviewed task-branch/main
+workflow.
 
 ## Setup and package manager versions
 
