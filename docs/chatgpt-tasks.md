@@ -28,13 +28,13 @@ Sources: engineering audit — local evidence: `<workspace>/project-standards-au
 
 ### Required command gates
 
-| Repository | Before-push gate |
-| --- | --- |
-| Frontend | `yarn check`; UI changes also require `yarn check:ui` (contrast, browser/accessibility/screenshots) |
-| Backend | `pnpm check` against an explicitly isolated local test database; migration work additionally requires replay/upgrade checks |
-| Mobile | `yarn check` includes all-platform JS export; native builds/device tests follow the change matrix in QUALITY_GATES.md |
-| Shared | `yarn check` includes build, direct tests and strict consumer-declaration compilation; API/runtime changes also validate affected apps |
-| Infrastructure | `npm run check` includes Terraform validation after real package builds; resource/provider changes additionally need a reviewed plan |
+| Repository     | Before-push gate                                                                                                                       |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend       | `yarn check`; UI changes also require `yarn check:ui` (contrast, browser/accessibility/screenshots)                                    |
+| Backend        | `pnpm check` against an explicitly isolated local test database; migration work additionally requires replay/upgrade checks            |
+| Mobile         | `yarn check` includes all-platform JS export; native builds/device tests follow the change matrix in QUALITY_GATES.md                  |
+| Shared         | `yarn check` includes build, direct tests and strict consumer-declaration compilation; API/runtime changes also validate affected apps |
+| Infrastructure | `npm run check` includes Terraform validation after real package builds; resource/provider changes additionally need a reviewed plan   |
 
 **CG-001 completed:** every repository exposes typecheck, non-writing format/lint, build and tests, enforced in CI and pre-push. Expo JS export does not prove native compilation; see the explicit platform matrix in the mobile quality guide. Store submission is not a test.
 
@@ -46,16 +46,16 @@ Target: a modern, quiet marketplace interface with neutral surfaces, readable da
 
 ### Historical styling diagnosis — initial audit, now repaired by the FE stories
 
-| Initial evidence | Cause at the initial audit | Repair story |
-| --- | --- | --- |
-| Dark-gray navigation labels on purple filled controls | Global `button` styles in App.css leak into `.main-nav-link`, which has no neutral background/padding reset | FE-002, FE-005 |
-| Forgot-password link looks like a large purple CTA beside login | It is a button styled only for text, so it inherits the global filled-button treatment | FE-002, FE-004 |
+| Initial evidence                                                         | Cause at the initial audit                                                                                                                                 | Repair story   |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| Dark-gray navigation labels on purple filled controls                    | Global `button` styles in App.css leak into `.main-nav-link`, which has no neutral background/padding reset                                                | FE-002, FE-005 |
+| Forgot-password link looks like a large purple CTA beside login          | It is a button styled only for text, so it inherits the global filled-button treatment                                                                     | FE-002, FE-004 |
 | Inputs show doubled/overlapping outlines with almost no vertical spacing | Raw auth `input` border/padding/height rules apply inside MUI OutlinedInput, alongside its own outline and wrapper `sx`; form layout has no consistent gap | FE-003, FE-004 |
-| Placeholder text is almost invisible | `--text-placeholder: #d5d5d5`, compounded by MUI placeholder opacity, on a pale input surface | FE-001, FE-003 |
-| Selected check mark has the wrong foreground | Global `span { color: ... }` overrides inherited foreground inside the selected button | FE-002, FE-004 |
-| Buttons differ in height, radius, padding, and text size | Global rules, nav classes, page CSS, FormButton, MUI defaults, and a 900px breakpoint setting 28px button labels all compete | FE-002, FE-005 |
-| Palette check passes while screens remain unreadable | `check-wcag.mjs` hardcodes stale colors and applies a 3:1 threshold to 14–16px button labels | FE-001, FE-008 |
-| Layout spacing is fragile | App.tsx uses a fixed spacer and repeated `<br>` elements; mixed page widths and imperative nav class mutations | FE-005, FE-006 |
+| Placeholder text is almost invisible                                     | `--text-placeholder: #d5d5d5`, compounded by MUI placeholder opacity, on a pale input surface                                                              | FE-001, FE-003 |
+| Selected check mark has the wrong foreground                             | Global `span { color: ... }` overrides inherited foreground inside the selected button                                                                     | FE-002, FE-004 |
+| Buttons differ in height, radius, padding, and text size                 | Global rules, nav classes, page CSS, FormButton, MUI defaults, and a 900px breakpoint setting 28px button labels all compete                               | FE-002, FE-005 |
+| Palette check passes while screens remain unreadable                     | `check-wcag.mjs` hardcodes stale colors and applies a 3:1 threshold to 14–16px button labels                                                               | FE-001, FE-008 |
+| Layout spacing is fragile                                                | App.tsx uses a fixed spacer and repeated `<br>` elements; mixed page widths and imperative nav class mutations                                             | FE-005, FE-006 |
 
 History identifies likely introduction points, not a proven single bad commit: `4686a520c` introduced the MUI FormInput wrapper while raw-input CSS remained; `e06921d04` introduced the S-070 palette/checker; `354ee6512` modified auth/nav styling and colors but left the conflicts above. Verify focused diffs before changing or reverting anything. Do not revert whole commits containing working functionality.
 
@@ -72,17 +72,17 @@ Historical note: the original 20 October diagnosis covered public screens only. 
 
 Calculated from the initial audit CSS values. These are the historical failing pairs, not the current repaired palette; current source is covered by the FE validation records.
 
-| Foreground / background | Ratio | Decision |
-| --- | --- | --- |
-| Gray `#555555` / action purple `#7d2ae8` | 1.20:1 | Fails text contrast; observed nav pairing |
-| Auth-link `#9e9eff` / white | 2.39:1 | Fails small link text |
-| Auth-link `#9e9eff` / action purple | 2.61:1 | Fails forgot-password text |
-| Placeholder `#d5d5d5` / input `#f5f5f5` | 1.35:1 | Fails text contrast even before opacity |
-| White / student green `#2e9e2e` | 3.47:1 | Fails 14–16px labels |
-| White / error red `#e4394c` | 4.21:1 | Fails 14–16px labels |
+| Foreground / background                  | Ratio  | Decision                                               |
+| ---------------------------------------- | ------ | ------------------------------------------------------ |
+| Gray `#555555` / action purple `#7d2ae8` | 1.20:1 | Fails text contrast; observed nav pairing              |
+| Auth-link `#9e9eff` / white              | 2.39:1 | Fails small link text                                  |
+| Auth-link `#9e9eff` / action purple      | 2.61:1 | Fails forgot-password text                             |
+| Placeholder `#d5d5d5` / input `#f5f5f5`  | 1.35:1 | Fails text contrast even before opacity                |
+| White / student green `#2e9e2e`          | 3.47:1 | Fails 14–16px labels                                   |
+| White / error red `#e4394c`              | 4.21:1 | Fails 14–16px labels                                   |
 | Input border `#c0c0c0` / input `#f5f5f5` | 1.67:1 | Insufficient if relied on to identify control boundary |
-| White / action purple `#7d2ae8` | 6.23:1 | Suitable baseline for normal text |
-| White / employer purple `#5d59ff` | 4.84:1 | Passes normal text; still check interaction states |
+| White / action purple `#7d2ae8`          | 6.23:1 | Suitable baseline for normal text                      |
+| White / employer purple `#5d59ff`        | 4.84:1 | Passes normal text; still check interaction states     |
 
 Use **4.5:1 for normal text**, including 14–16px bold button labels; 3:1 is allowed only for qualifying large text (at least 24 CSS px regular or about 18.67 CSS px bold). Necessary control/state indicators require 3:1 against adjacent colors. Disabled controls have WCAG exceptions but should still look intentional and readable. Check hover, selected, focus, loading, error, and images/overlays, not just token values.
 
@@ -107,13 +107,13 @@ Acceptance criteria:
 
 **Completion — 28 October 2026:** implemented, validated and pushed to main in all five repositories. Task branch: `S-108-quality-gates`. All five remote main commit IDs were verified after push; all pre-push hooks passed. Remote Actions/deployment/live outcomes are not claimed.
 
-| Repository checkout | Main commit | Evidence |
-| --- | --- | --- |
-| student-employer-backend-codebooks | [6e872b4cb](https://github.com/MatijaGenc/student-employer-backend/commit/6e872b4cbae26bc1d4824e4cf4ccde1d61eb02ea) | [Validation](https://github.com/MatijaGenc/student-employer-backend/blob/main/CG001_VALIDATION.md) |
-| student-employer-frontend-review | [d290ad5c6](https://github.com/MatijaGenc/student-employer-frontend/commit/d290ad5c63affc4fae08a1c349698bec680accfd) | [Validation](https://github.com/MatijaGenc/student-employer-frontend/blob/main/CG001_VALIDATION.md) |
-| student-employer-mobile-review | [13db229be](https://github.com/MatijaGenc/student-employer-mobile/commit/13db229bea13e11fb4fa50d54c711dd262df6f4a) | [Validation](https://github.com/MatijaGenc/student-employer-mobile/blob/main/CG001_VALIDATION.md) |
-| studup-shared-release-build | [62fd160f6](https://github.com/MatijaGenc/studup-shared/commit/62fd160f65da46788d64dda45efac0c235d94f31) | [Validation](https://github.com/MatijaGenc/studup-shared/blob/main/CG001_VALIDATION.md) |
-| studup-infrastructure-review | [ee4b68e53](https://github.com/MatijaGenc/studup-infrastructure/commit/ee4b68e53ad781d745d6a1e305fec5df4ad667ce) | [Validation](https://github.com/MatijaGenc/studup-infrastructure/blob/main/CG001_VALIDATION.md) |
+| Repository checkout                | Main commit                                                                                                          | Evidence                                                                                            |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| student-employer-backend-codebooks | [6e872b4cb](https://github.com/MatijaGenc/student-employer-backend/commit/6e872b4cbae26bc1d4824e4cf4ccde1d61eb02ea)  | [Validation](https://github.com/MatijaGenc/student-employer-backend/blob/main/CG001_VALIDATION.md)  |
+| student-employer-frontend-review   | [d290ad5c6](https://github.com/MatijaGenc/student-employer-frontend/commit/d290ad5c63affc4fae08a1c349698bec680accfd) | [Validation](https://github.com/MatijaGenc/student-employer-frontend/blob/main/CG001_VALIDATION.md) |
+| student-employer-mobile-review     | [13db229be](https://github.com/MatijaGenc/student-employer-mobile/commit/13db229bea13e11fb4fa50d54c711dd262df6f4a)   | [Validation](https://github.com/MatijaGenc/student-employer-mobile/blob/main/CG001_VALIDATION.md)   |
+| studup-shared-release-build        | [62fd160f6](https://github.com/MatijaGenc/studup-shared/commit/62fd160f65da46788d64dda45efac0c235d94f31)             | [Validation](https://github.com/MatijaGenc/studup-shared/blob/main/CG001_VALIDATION.md)             |
+| studup-infrastructure-review       | [ee4b68e53](https://github.com/MatijaGenc/studup-infrastructure/commit/ee4b68e53ad781d745d6a1e305fec5df4ad667ce)     | [Validation](https://github.com/MatijaGenc/studup-infrastructure/blob/main/CG001_VALIDATION.md)     |
 
 Validation: backend 318 Vitest + 5 scraper + 9 gate tests; frontend 229 Vitest + 9 gate tests, both-theme contrast and 53/53 Linux Chromium cases without screenshot updates; mobile 60 Jest + 9 gate tests and Android/iOS/web JS exports; shared 8 direct + 9 gate tests and strict public declaration consumer compile; infrastructure 4 authorizer + 6 Python + 9 gate tests, clean backend-disabled Terraform replay, hash-locked Python runtime wheels and identical repeat ZIP hashes. Workflow YAML, Markdown/local links, diff whitespace and staged secret-pattern review passed. Empty test selections fail; shared comment-only/all-skipped suites fail too.
 
@@ -246,7 +246,7 @@ Acceptance criteria:
 - [x] The website logo is a real home link: `/landing` when logged out and `/home` when logged in. It has an accessible Croatian name (e.g. “StudUp — početna”), keyboard focus, and standard open-in-new-tab behavior; clicking it never logs the user out or discards work silently.
 - [x] Provide an obvious home destination in desktop and mobile navigation; the active page is identified visually and with `aria-current`, beyond color alone.
 - [x] Use real links for page navigation and buttons for actions; browser Back/Forward, copied URLs, direct visits, refresh, and modified-click navigation work consistently.
-**Resolved routing gap:** authentication destinations now encode mode/account type in copyable URLs. Modified-click preserves the original tab; refresh and Back/Forward retain the intended screen, with no credentials in URLs.
+  **Resolved routing gap:** authentication destinations now encode mode/account type in copyable URLs. Modified-click preserves the original tab; refresh and Back/Forward retain the intended screen, with no credentials in URLs.
 
 - [x] Mobile menu uses a readable 16–18px baseline rather than indiscriminate 28px button labels; target sizes come from padding/hit areas.
 - [x] Replace imperative class-list layout mutations with declarative state and CSS/MUI breakpoints where practical.
@@ -760,25 +760,25 @@ Added on 20 October 2026 after a second source/configuration review and read-onl
 
 Installed versions were read from local `node_modules`; declared ranges and lockfiles were inspected separately. Registry values are a dated snapshot, not permanent upgrade targets. Check them again when implementing. A newer major version is a candidate, not an instruction to upgrade everything together.
 
-| Package / area | Local installed version | Registry `latest` observed | Recommendation |
-| --- | --- | --- | --- |
-| Mobile Expo | 57.0.8 | 58.0.16 | Plan one SDK upgrade with its supported native dependency set |
-| Mobile React Native | 0.86.0 | 0.88.0 | Follow the chosen Expo SDK; do not bump independently |
-| Mobile React | 19.3.1 | 19.3.1 | Already at observed latest; retain SDK compatibility |
-| Frontend React | 19.2.8 | 19.3.1 | Evaluate the patch/minor update with React DOM and types |
-| Backend/shared/frontend TypeScript | 7.0.2 | 7.0.2 | Already current in the inspected installation |
-| Mobile TypeScript | 6.0.3 | 7.0.2 | Evaluate SDK/toolchain support before upgrading |
-| Backend/mobile Zod | 3.25.76 | 4.6.7 | Resolve mixed-major shared-schema composition first |
-| Shared/frontend Zod | 4.6.7 | 4.6.7 | Already at observed latest |
-| Backend Prisma CLI/client/PG adapter | 7.10.1 each | CLI tag: **8.0.0-rc.23**; client/adapter: **7.10.1** | Keep the aligned stable set; do not install an RC through `latest` automatically |
-| Frontend Vite / MUI | 8.3.4 / 9.5.0 | 8.3.4 / 9.5.0 | Already at observed latest |
-| Frontend/backend Vitest | 4.1.10 / 4.1.12 | 5.0.5 | Separate major-upgrade story with coverage/plugin compatibility |
-| Backend Pino / esbuild | 8.21.0 / 0.23.1 | 10.4.0 / 0.28.2 | Review changes and test logging/Lambda packaging separately |
-| Mobile Axios / frontend Axios | 1.18.1 / 1.20.0 | 1.20.0 | Update mobile lockfile if compatible; run auth/network regression tests |
-| Mobile React Navigation | 6.1.18 | 7.5.1 | Coordinated navigation-family migration only after flow/device baselines |
-| Mobile form resolvers | 3.10.0 | 6.0.0 | Coordinate with Zod and React Hook Form; no isolated major bump |
-| Frontend form resolvers | **5.5.7 installed**, **5.9.1 declared/locked** | 6.0.0 | Fix installation drift before judging upgrade compatibility |
-| Mobile Jest-Expo | 58.0.11 with Expo 57 | 58.0.11 | Version being latest does not mean it fits this SDK; its published peer expects RN Jest preset ^0.88.0 while local is 0.86.0 |
+| Package / area                       | Local installed version                        | Registry `latest` observed                           | Recommendation                                                                                                               |
+| ------------------------------------ | ---------------------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Mobile Expo                          | 57.0.8                                         | 58.0.16                                              | Plan one SDK upgrade with its supported native dependency set                                                                |
+| Mobile React Native                  | 0.86.0                                         | 0.88.0                                               | Follow the chosen Expo SDK; do not bump independently                                                                        |
+| Mobile React                         | 19.3.1                                         | 19.3.1                                               | Already at observed latest; retain SDK compatibility                                                                         |
+| Frontend React                       | 19.2.8                                         | 19.3.1                                               | Evaluate the patch/minor update with React DOM and types                                                                     |
+| Backend/shared/frontend TypeScript   | 7.0.2                                          | 7.0.2                                                | Already current in the inspected installation                                                                                |
+| Mobile TypeScript                    | 6.0.3                                          | 7.0.2                                                | Evaluate SDK/toolchain support before upgrading                                                                              |
+| Backend/mobile Zod                   | 3.25.76                                        | 4.6.7                                                | Resolve mixed-major shared-schema composition first                                                                          |
+| Shared/frontend Zod                  | 4.6.7                                          | 4.6.7                                                | Already at observed latest                                                                                                   |
+| Backend Prisma CLI/client/PG adapter | 7.10.1 each                                    | CLI tag: **8.0.0-rc.23**; client/adapter: **7.10.1** | Keep the aligned stable set; do not install an RC through `latest` automatically                                             |
+| Frontend Vite / MUI                  | 8.3.4 / 9.5.0                                  | 8.3.4 / 9.5.0                                        | Already at observed latest                                                                                                   |
+| Frontend/backend Vitest              | 4.1.10 / 4.1.12                                | 5.0.5                                                | Separate major-upgrade story with coverage/plugin compatibility                                                              |
+| Backend Pino / esbuild               | 8.21.0 / 0.23.1                                | 10.4.0 / 0.28.2                                      | Review changes and test logging/Lambda packaging separately                                                                  |
+| Mobile Axios / frontend Axios        | 1.18.1 / 1.20.0                                | 1.20.0                                               | Update mobile lockfile if compatible; run auth/network regression tests                                                      |
+| Mobile React Navigation              | 6.1.18                                         | 7.5.1                                                | Coordinated navigation-family migration only after flow/device baselines                                                     |
+| Mobile form resolvers                | 3.10.0                                         | 6.0.0                                                | Coordinate with Zod and React Hook Form; no isolated major bump                                                              |
+| Frontend form resolvers              | **5.5.7 installed**, **5.9.1 declared/locked** | 6.0.0                                                | Fix installation drift before judging upgrade compatibility                                                                  |
+| Mobile Jest-Expo                     | 58.0.11 with Expo 57                           | 58.0.11                                              | Version being latest does not mean it fits this SDK; its published peer expects RN Jest preset ^0.88.0 while local is 0.86.0 |
 
 Registry evidence: [Expo](https://registry.npmjs.org/expo/latest), [React Native](https://registry.npmjs.org/react-native/latest), [React](https://registry.npmjs.org/react/latest), [TypeScript](https://registry.npmjs.org/typescript/latest), [Zod](https://registry.npmjs.org/zod/latest), [Prisma CLI](https://registry.npmjs.org/prisma/latest), [Prisma Client](https://registry.npmjs.org/@prisma%2Fclient/latest), [Prisma adapter](https://registry.npmjs.org/@prisma%2Fadapter-pg/latest), [Vitest](https://registry.npmjs.org/vitest/latest), [Pino](https://registry.npmjs.org/pino/latest), [esbuild](https://registry.npmjs.org/esbuild/latest), [Axios](https://registry.npmjs.org/axios/latest), [React Navigation](https://registry.npmjs.org/@react-navigation%2Fnative/latest), [resolvers](https://registry.npmjs.org/@hookform%2Fresolvers/latest), [Jest-Expo](https://registry.npmjs.org/jest-expo/latest), [Vite](https://registry.npmjs.org/vite/latest), [MUI](https://registry.npmjs.org/@mui%2Fmaterial/latest).
 
@@ -1047,16 +1047,16 @@ Evidence: shared `stringDate` accepts null/empty values, while job creation asse
 
 **Recommendation:** keep Vitest for web/backend, Jest + React Native Testing Library for mobile, Playwright for web, Maestro for native, and k6 for load. Do not replace tools merely to get a higher test count. Improve what they exercise. Snapshot/render-string checks cannot prove successful login, native layout, database invariants, or authorization.
 
-| Test layer | What it must prove | Normal execution point |
-| --- | --- | --- |
-| Unit / boundary tests | Validation, transforms, status transitions, date/time and retry logic | Every affected push |
-| Component interactions | Enter input, submit, await UI state, assert error/loading/navigation | Every affected push |
-| API contract / handler dispatch | Real client payloads and real handler responses/routes agree | Every API/shared/client push |
-| PostgreSQL integration | Migrations, constraints, authorization queries, transactions/concurrency | Every backend/data push |
-| Browser/native E2E | A few complete student/employer journeys on isolated services | Relevant push/release gate; document any platform-specific cadence |
-| Accessibility / visual | Computed contrast, keyboard/screen reader, responsive/native layout | Every affected UI push |
-| Security regression | Cross-account access, leaked fields, token lifecycle, abuse limits | Every affected auth/data push |
-| Resilience / load | Timeouts, provider failure, rotation, queue retry, saturation | Relevant architecture/release changes against an isolated environment |
+| Test layer                      | What it must prove                                                       | Normal execution point                                                |
+| ------------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| Unit / boundary tests           | Validation, transforms, status transitions, date/time and retry logic    | Every affected push                                                   |
+| Component interactions          | Enter input, submit, await UI state, assert error/loading/navigation     | Every affected push                                                   |
+| API contract / handler dispatch | Real client payloads and real handler responses/routes agree             | Every API/shared/client push                                          |
+| PostgreSQL integration          | Migrations, constraints, authorization queries, transactions/concurrency | Every backend/data push                                               |
+| Browser/native E2E              | A few complete student/employer journeys on isolated services            | Relevant push/release gate; document any platform-specific cadence    |
+| Accessibility / visual          | Computed contrast, keyboard/screen reader, responsive/native layout      | Every affected UI push                                                |
+| Security regression             | Cross-account access, leaked fields, token lifecycle, abuse limits       | Every affected auth/data push                                         |
+| Resilience / load               | Timeouts, provider failure, rotation, queue retry, saturation            | Relevant architecture/release changes against an isolated environment |
 
 **S-141 implemented/merged (4 November):** backend `5941ac9` makes public `getJobs` created-time ties deterministic by ID; rating ties use created time then ID, all in the requested direction. Four new database regressions fail before the fix and pass after; reviewer independently passes 18 focused tests. Full/pre-push gates pass 208 unit +465 integration +5 scraper +16 tooling checks. Exact Backend CI/deployment/smoke 41915420028 and secret scan 41915420220 succeed; S-141 is complete. This covers public search only; other lists, changing-data offset behavior, date/range policy and measured query performance remain open.
 
@@ -1159,14 +1159,14 @@ Validation after the enabling fixes: `yarn typecheck` passed; `yarn lint` passed
 
 ### Verified public-screen findings
 
-| Finding | Evidence | Existing/new task |
-| --- | --- | --- |
-| Login labels and field text are much too small; borders are faint | Visible login and registration, plus 8px labels / 12px inputs in source | MOB-001 |
-| Login/password recovery distribute content across large empty vertical gaps; fields stretch across the full desktop preview | Runtime screenshots; percentage/full-height auth layout | MOB-002; native reproduction still required |
-| Student faculty/job selectors remain empty with no useful load-failure/retry message | Failed startup/registration requests and blank controls | MOB-004, MOB-009 |
-| Many interactive labels appear as generic text in the web accessibility tree | Login, role controls, recovery, dropdowns, custom back control | MOB-001; verify native VoiceOver/TalkBack separately |
-| Android JS export fails before native build on missing `buffer` imported by legacy AppSync signing code | `expo export --platform all` output | MOB-008 |
-| Circular module imports and incomplete Sentry config appear during startup | Metro diagnostics | MOB-008, OPS-001 |
+| Finding                                                                                                                     | Evidence                                                                | Existing/new task                                    |
+| --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------- |
+| Login labels and field text are much too small; borders are faint                                                           | Visible login and registration, plus 8px labels / 12px inputs in source | MOB-001                                              |
+| Login/password recovery distribute content across large empty vertical gaps; fields stretch across the full desktop preview | Runtime screenshots; percentage/full-height auth layout                 | MOB-002; native reproduction still required          |
+| Student faculty/job selectors remain empty with no useful load-failure/retry message                                        | Failed startup/registration requests and blank controls                 | MOB-004, MOB-009                                     |
+| Many interactive labels appear as generic text in the web accessibility tree                                                | Login, role controls, recovery, dropdowns, custom back control          | MOB-001; verify native VoiceOver/TalkBack separately |
+| Android JS export fails before native build on missing `buffer` imported by legacy AppSync signing code                     | `expo export --platform all` output                                     | MOB-008                                              |
+| Circular module imports and incomplete Sentry config appear during startup                                                  | Metro diagnostics                                                       | MOB-008, OPS-001                                     |
 
 Screenshots:
 
@@ -1561,16 +1561,16 @@ Status: done. Commit 47422786c is pushed to main and the remote head is verified
 
 The fresh recheck supersedes earlier completion claims where noted above; historical implementation records remain for traceability. Full report and acceptance criteria — local evidence: `<workspace>/recheck-report-2026-11-01.md` (not published).
 
-| Follow-up | Priority | Required repair | Status |
-|---|---|---|---|
-| RCH-001 / API-002 | P0 | Allow current browser write headers on private gateway preflight; verify a cross-origin authenticated journey | DONE — main `3f6a7e1`, CI/deployed/live-verified; isolated authenticated backend journey passes |
-| RCH-002 / SEC-005, API-004 | P1 | Prevent plaintext refresh credentials in the idempotency response cache | DONE — main `1c9b4f5`, backend run 41345443806; encrypted session responses, migration applied, real-dispatch at-rest test passes, smoke passes |
-| RCH-003 / SEC-005, API-004 | P1 | Preserve safe session-cookie behavior after a lost login response | DONE — main `1c9b4f5`; login replay preserves the cookie, refresh after replay succeeds, logout replay preserves cookie clearing, refresh replay does not double-rotate |
-| RCH-004 / API-004 | P2 | Release normally returned transient 5xx results instead of replaying them | SUPERSEDED IN PART — original main `7f28ac9` passed its checks; RCH-011 (`88bc4f6`) replaces generic 5xx release and stale-lease takeover with durable uncertain-outcome protection |
-| RCH-005 / FE-007, FE-008 | P2 | Name actual rating dialogs, make empty admin scroll regions keyboard accessible, and block serious findings | DONE — frontend main `69897dd`, run 41351844768; linked dialog title + Escape, named focusable admin regions, blocking best-practice regressions, 184 browser cases pass |
-| RCH-006 / DATA-002 | P1 | Independent outbox worker/retry recovery without holding user responses | DONE — backend main `4cfaa1a` (run 41357645327) + infra main `37c5907` (run 41356994451); scheduled worker, lease/backoff, guarded requeue recovery, alarms OK, API no longer waits |
-| RCH-007 / DATA-002, MOB-003 | P2 | Open the intended job from web/native notification taps, including login/cold launch | Implementation and iOS fixture review verified — web `2760dd8b6`, mobile follow-ups `83d7a0b`/`8816813`; web/mobile gates and CI pass, 200 browser cases and live login handoff pass, simulator repeated history opening and both themes verified; signed iOS/Android delivery/tap acceptance remain |
-| RCH-008 / DATA-002 | P2 | Durable audit intent/recovery when persistence fails after a mutation | DONE — main `ea5af89` (after `373ab4d`), CI 41363921402 green, both Lambdas active; precommitted intent, safe recovery, crash/credential tests pass |
+| Follow-up                   | Priority | Required repair                                                                                               | Status                                                                                                                                                                                                                                                                                               |
+| --------------------------- | -------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RCH-001 / API-002           | P0       | Allow current browser write headers on private gateway preflight; verify a cross-origin authenticated journey | DONE — main `3f6a7e1`, CI/deployed/live-verified; isolated authenticated backend journey passes                                                                                                                                                                                                      |
+| RCH-002 / SEC-005, API-004  | P1       | Prevent plaintext refresh credentials in the idempotency response cache                                       | DONE — main `1c9b4f5`, backend run 41345443806; encrypted session responses, migration applied, real-dispatch at-rest test passes, smoke passes                                                                                                                                                      |
+| RCH-003 / SEC-005, API-004  | P1       | Preserve safe session-cookie behavior after a lost login response                                             | DONE — main `1c9b4f5`; login replay preserves the cookie, refresh after replay succeeds, logout replay preserves cookie clearing, refresh replay does not double-rotate                                                                                                                              |
+| RCH-004 / API-004           | P2       | Release normally returned transient 5xx results instead of replaying them                                     | SUPERSEDED IN PART — original main `7f28ac9` passed its checks; RCH-011 (`88bc4f6`) replaces generic 5xx release and stale-lease takeover with durable uncertain-outcome protection                                                                                                                  |
+| RCH-005 / FE-007, FE-008    | P2       | Name actual rating dialogs, make empty admin scroll regions keyboard accessible, and block serious findings   | DONE — frontend main `69897dd`, run 41351844768; linked dialog title + Escape, named focusable admin regions, blocking best-practice regressions, 184 browser cases pass                                                                                                                             |
+| RCH-006 / DATA-002          | P1       | Independent outbox worker/retry recovery without holding user responses                                       | DONE — backend main `4cfaa1a` (run 41357645327) + infra main `37c5907` (run 41356994451); scheduled worker, lease/backoff, guarded requeue recovery, alarms OK, API no longer waits                                                                                                                  |
+| RCH-007 / DATA-002, MOB-003 | P2       | Open the intended job from web/native notification taps, including login/cold launch                          | Implementation and iOS fixture review verified — web `2760dd8b6`, mobile follow-ups `83d7a0b`/`8816813`; web/mobile gates and CI pass, 200 browser cases and live login handoff pass, simulator repeated history opening and both themes verified; signed iOS/Android delivery/tap acceptance remain |
+| RCH-008 / DATA-002          | P2       | Durable audit intent/recovery when persistence fails after a mutation                                         | DONE — main `ea5af89` (after `373ab4d`), CI 41363921402 green, both Lambdas active; precommitted intent, safe recovery, crash/credential tests pass                                                                                                                                                  |
 
 Later follow-ups **RCH-009–RCH-016** are recorded in the dated sections below; the 3 November reconciliation records subsequent mobile work and RCH-017.
 
@@ -1844,20 +1844,20 @@ The full detailed report records current branch decisions and checks. No merge, 
 
 All 28 OpenCode sessions created for this review batch were stopped or confirmed idle; other sessions were untouched. Resume with fresh bounded `openrouter/deepseek/deepseek-v4.1-flash-1017` sessions, not old histories. No new model work is running.
 
-| Story/slice | State at checkpoint | Evidence / next action |
-| --- | --- | --- |
-| MOB-007 clean startup | Complete on main `34d4eaa` (ancestor of mobile main) | Clean dependencies, both native builds/offline startup and exact CI pass. |
-| MOB-001-A Back icon contrast | Complete on mobile main `60b2813` | Native light/dark screenshots, source-map identity, regressions and exact CI pass. |
-| S-141 stable search ordering | Complete on backend main ancestry `5941ac9` | 4 old-handler failures; 18 focused passes; full gates and exact deployment/smoke pass. |
-| S-142 optional alert minimum | Complete on backend main ancestry `293c6a9` | Category-only create and null-to-clear semantics; 7 old-handler failures, 22 focused passes, 213 unit/482 integration and exact deployment pass. |
-| ALERT-003 web edit errors/clear | Complete slice on web main `370584477` | 368 unit, 16 tooling, 206 UI checks and exact CI/deployment pass. Parent remains open. |
-| S-143 alert database matrix | Complete on backend main `9882a9d` | 14 focused matcher tests; full 213 unit/486 integration, replay across all 3 pages, no added warnings, exact CI/deployment pass. |
-| DOC-001-A project entry | Complete on infrastructure main ancestry `43fa6bb` | Versioned `docs/PROJECT.md` linked from README; full gates/exact CI pass. Master ledger still local. |
-| REPO-001-A/B update configurations | Delivered on shared `5fef91c` / infrastructure `1bee9b7` | YAML/full gates/exact CI pass; shared initial updater jobs succeed. Other repositories, licenses and remaining operational verification stay open. |
-| TEST-004-A default E2E guard | Complete on frontend main `358a24a32` | Commits `a13b2122b` + `358a24a32`: explicit loopback APIs, no production defaults/reused server; 14 self-tests, 368 unit + 30 tooling checks and 3/3 isolated landing E2E. Exact Deploy Frontend 41931370230 and secret scan 41931370265 pass. |
-| MOB-001-B shared controls | Complete focused slice on mobile main `31fadd6` | 170 app tests/26 suites +23 tooling; 13 tightened pixel-gate tests; both Release builds and all four native cases pass. Seven sources match both maps. Exact quality CI 41978996455 and secret scan 41978996565 pass. Parent MOB-001 remains open for remaining contrast/helper criteria; MOB-003 enlarged-text navigation remains open. |
-| DEP-003 inventory | Read-only draft report, not a dependency upgrade | `recheck-fixes-2026-11-04/delegation/dependency-audit/REPORT.md`: dated registry/audit metadata. Review severity against actual code paths; no versions were changed. |
-| PROD-001 backend port / Brevo upgrade | Partial proposals only, workers interrupted | Preserve `delegation/prod001-backend-patch/` and `delegation/brevo-upgrade-proposal/`; inspect completeness before applying anything. No source changes/verification/publication claimed. |
+| Story/slice                           | State at checkpoint                                      | Evidence / next action                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MOB-007 clean startup                 | Complete on main `34d4eaa` (ancestor of mobile main)     | Clean dependencies, both native builds/offline startup and exact CI pass.                                                                                                                                                                                                                                                                |
+| MOB-001-A Back icon contrast          | Complete on mobile main `60b2813`                        | Native light/dark screenshots, source-map identity, regressions and exact CI pass.                                                                                                                                                                                                                                                       |
+| S-141 stable search ordering          | Complete on backend main ancestry `5941ac9`              | 4 old-handler failures; 18 focused passes; full gates and exact deployment/smoke pass.                                                                                                                                                                                                                                                   |
+| S-142 optional alert minimum          | Complete on backend main ancestry `293c6a9`              | Category-only create and null-to-clear semantics; 7 old-handler failures, 22 focused passes, 213 unit/482 integration and exact deployment pass.                                                                                                                                                                                         |
+| ALERT-003 web edit errors/clear       | Complete slice on web main `370584477`                   | 368 unit, 16 tooling, 206 UI checks and exact CI/deployment pass. Parent remains open.                                                                                                                                                                                                                                                   |
+| S-143 alert database matrix           | Complete on backend main `9882a9d`                       | 14 focused matcher tests; full 213 unit/486 integration, replay across all 3 pages, no added warnings, exact CI/deployment pass.                                                                                                                                                                                                         |
+| DOC-001-A project entry               | Complete on infrastructure main ancestry `43fa6bb`       | Versioned `docs/PROJECT.md` linked from README; full gates/exact CI pass. Master ledger still local.                                                                                                                                                                                                                                     |
+| REPO-001-A/B update configurations    | Delivered on shared `5fef91c` / infrastructure `1bee9b7` | YAML/full gates/exact CI pass; shared initial updater jobs succeed. Other repositories, licenses and remaining operational verification stay open.                                                                                                                                                                                       |
+| TEST-004-A default E2E guard          | Complete on frontend main `358a24a32`                    | Commits `a13b2122b` + `358a24a32`: explicit loopback APIs, no production defaults/reused server; 14 self-tests, 368 unit + 30 tooling checks and 3/3 isolated landing E2E. Exact Deploy Frontend 41931370230 and secret scan 41931370265 pass.                                                                                           |
+| MOB-001-B shared controls             | Complete focused slice on mobile main `31fadd6`          | 170 app tests/26 suites +23 tooling; 13 tightened pixel-gate tests; both Release builds and all four native cases pass. Seven sources match both maps. Exact quality CI 41978996455 and secret scan 41978996565 pass. Parent MOB-001 remains open for remaining contrast/helper criteria; MOB-003 enlarged-text navigation remains open. |
+| DEP-003 inventory                     | Read-only draft report, not a dependency upgrade         | `recheck-fixes-2026-11-04/delegation/dependency-audit/REPORT.md`: dated registry/audit metadata. Review severity against actual code paths; no versions were changed.                                                                                                                                                                    |
+| PROD-001 backend port / Brevo upgrade | Partial proposals only, workers interrupted              | Preserve `delegation/prod001-backend-patch/` and `delegation/brevo-upgrade-proposal/`; inspect completeness before applying anything. No source changes/verification/publication claimed.                                                                                                                                                |
 
 **Resume:** finish MOB-001-B native gates, then mobile alert zero/null adapter and the misleading signup category prompt; review prepared lifecycle/dependency proposals separately. Preserve other tools' unfinished branches and existing dirty work. Original feature branches remain unmerged.
 

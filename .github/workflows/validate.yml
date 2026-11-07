@@ -1,40 +1,40 @@
 name: Validate infrastructure and Lambda packages
 on:
-  push:
-    branches: [main]
-  pull_request:
+    push:
+        branches: [main]
+    pull_request:
 permissions:
-  contents: read
+    contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: 26
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-        with:
-          python-version: '3.12'
-      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
-        with:
-          terraform_version: 1.15.8
-      - run: npm ci --ignore-scripts
-      - run: npm --prefix authorizer ci
-      - run: python3 -m venv .venv-quality
-      - run: .venv-quality/bin/pip install -r requirements-quality.txt
-      - run: terraform init -backend=false -lockfile=readonly
-      - run: npm run check
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: lambda-packages
-          path: |
-            authorizer.zip
-            migration-runner-placeholder.zip
-            rotation-function.zip
-          if-no-files-found: error
+    validate:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+            - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+              with:
+                  node-version: 26
+            - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+              with:
+                  python-version: "3.12"
+            - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+              with:
+                  terraform_version: 1.15.8
+            - run: npm ci --ignore-scripts
+            - run: npm --prefix authorizer ci
+            - run: python3 -m venv .venv-quality
+            - run: .venv-quality/bin/pip install -r requirements-quality.txt
+            - run: terraform init -backend=false -lockfile=readonly
+            - run: npm run check
+            - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+              with:
+                  name: lambda-packages
+                  path: |
+                      authorizer.zip
+                      migration-runner-placeholder.zip
+                      rotation-function.zip
+                  if-no-files-found: error

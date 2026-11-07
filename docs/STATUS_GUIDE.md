@@ -5,13 +5,13 @@ repository. A status word is only as strong as the evidence that names it.
 
 ## State definitions
 
-| State | Means | Minimum evidence |
-|-------|-------|------------------|
-| **Implemented** | Code/config exists in a working tree or branch. | Exact file paths, commit or diff. No claim beyond "written". |
-| **Validated** | The implemented slice passed the applicable local checks. | Command names/results and the exact commit; note skipped or unavailable checks. |
-| **Merged** | The validated commit is on the named shared branch. | Remote branch/merge commit or PR identifier verified independently. |
-| **Deployed** | The merged artifact was published by the deploy path. | Workflow/deploy record naming the commit and artifact; environment named. |
-| **Live verified** | A live check against the deployed artifact passed. | Time, environment, check and observed result tied to the deployed commit. |
+| State             | Means                                                     | Minimum evidence                                                                |
+| ----------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **Implemented**   | Code/config exists in a working tree or branch.           | Exact file paths, commit or diff. No claim beyond "written".                    |
+| **Validated**     | The implemented slice passed the applicable local checks. | Command names/results and the exact commit; note skipped or unavailable checks. |
+| **Merged**        | The validated commit is on the named shared branch.       | Remote branch/merge commit or PR identifier verified independently.             |
+| **Deployed**      | The merged artifact was published by the deploy path.     | Workflow/deploy record naming the commit and artifact; environment named.       |
+| **Live verified** | A live check against the deployed artifact passed.        | Time, environment, check and observed result tied to the deployed commit.       |
 
 Implemented does not imply validated; validated does not imply merged; merged does
 not imply deployed; deployed does not imply live verified. Never collapse these into a
