@@ -7,6 +7,9 @@ resource "aws_secretsmanager_secret_version" "database_password" {
   secret_id     = aws_secretsmanager_secret.database_password.id
   secret_string = var.db_password
 
+  # RDS master password is rotated every 30 days by the
+  # studup-db-password-rotation Lambda; Terraform seeds only the initial value.
+  # Owner: security owner / rotation Lambda.
   lifecycle {
     ignore_changes = [secret_string]
   }
@@ -21,6 +24,8 @@ resource "aws_secretsmanager_secret_version" "jwt_secret" {
   secret_id     = aws_secretsmanager_secret.jwt_secret.id
   secret_string = var.jwt_secret
 
+  # JWT signing secret is rotated out-of-band per the incident/recovery
+  # runbook; Terraform seeds only the initial value. Owner: security owner.
   lifecycle {
     ignore_changes = [secret_string]
   }
@@ -35,6 +40,8 @@ resource "aws_secretsmanager_secret_version" "email_api_key" {
   secret_id     = aws_secretsmanager_secret.email_api_key.id
   secret_string = var.email_api_key
 
+  # Brevo API key is rotated in the Brevo console and written here out-of-band;
+  # Terraform seeds only the initial value. Owner: email owner / security owner.
   lifecycle {
     ignore_changes = [secret_string]
   }

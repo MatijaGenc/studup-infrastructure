@@ -52,10 +52,12 @@ resource "aws_iam_role" "lambda" {
     ]
   })
 
+  # The live role has AWS managed policies (VPC access/logs) attached outside
+  # Terraform because only the custom attachments are modelled here. Ignoring
+  # the computed set avoids detaching them; importing them is a separate,
+  # owner-reviewed change. Owner: platform owner / security owner.
   lifecycle {
-    ignore_changes = [
-      managed_policy_arns,
-    ]
+    ignore_changes = [managed_policy_arns]
   }
 }
 
@@ -141,6 +143,10 @@ resource "aws_lambda_function" "data_handler" {
     }
   }
 
+  # The backend release workflow deploys handler code with
+  # `aws lambda update-function-code`; the Lambda API does not return
+  # Terraform's S3 source location, so reasserting these fields would plan a
+  # stale-artifact republish. Owner: backend release workflow.
   lifecycle {
     ignore_changes = [
       s3_key,
@@ -212,6 +218,10 @@ resource "aws_lambda_function" "outbox_worker" {
 
   depends_on = [aws_cloudwatch_log_group.outbox_worker]
 
+  # The backend release workflow deploys handler code with
+  # `aws lambda update-function-code`; the Lambda API does not return
+  # Terraform's S3 source location, so reasserting these fields would plan a
+  # stale-artifact republish. Owner: backend release workflow.
   lifecycle {
     ignore_changes = [
       s3_key,

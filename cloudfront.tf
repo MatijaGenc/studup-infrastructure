@@ -108,6 +108,9 @@ resource "aws_cloudfront_distribution" "studup" {
     Name = "studup-website-cdn"
   }
 
+  # TTLs are governed by the referenced managed cache policy; these legacy
+  # inline fields are not managed in Terraform. This is a provider/cache-policy
+  # default, not an out-of-band change. Owner: infrastructure Terraform.
   lifecycle {
     ignore_changes = [
       default_cache_behavior[0].default_ttl,

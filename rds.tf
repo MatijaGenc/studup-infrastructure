@@ -31,24 +31,24 @@ resource "aws_db_instance" "dev" {
 
   lifecycle {
     ignore_changes = [
-      engine_version,
-      db_name,
-      backup_target,
-      ca_cert_identifier,
-      customer_owned_ip_enabled,
-      database_insights_mode,
+      # RDS log exports and IAM database authentication were enabled in the
+      # console and remain console-owned. Owner: platform owner.
       enabled_cloudwatch_logs_exports,
       iam_database_authentication_enabled,
-      iops,
-      kms_key_id,
-      license_model,
-      storage_throughput,
-      parameter_group_name,
-      option_group_name,
-      performance_insights_kms_key_id,
-      performance_insights_retention_period,
+      # Extra security groups may be attached from the console; Terraform owns
+      # only the primary attachment. Owner: platform owner.
       vpc_security_group_ids,
+      # RDS master password is rotated every 30 days by the rotation Lambda.
+      # Owner: security owner / studup-db-password-rotation.
       password,
+      # ForceNew attributes inherited from the console-created instance. They
+      # are Optional+Computed, so omitting them normally produces no diff, but
+      # keeping the ignore guarantees the narrowed list cannot plan a
+      # replacement. Remove after an owner-reviewed plan/import. Owner:
+      # platform owner.
+      db_name,
+      backup_target,
+      kms_key_id,
     ]
   }
 

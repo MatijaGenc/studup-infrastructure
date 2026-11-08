@@ -18,6 +18,8 @@ Build creates fresh Lambda ZIPs from hash-locked Python 3.12 runtime wheels (inc
 
 Terraform resource/provider changes additionally need a reviewed plan against the intended environment before apply. Tooling-only changes need validation and package tests; production plan/apply is inapplicable if no resource configuration changed. Native/mobile checks are inapplicable here. No quality command deploys resources. Package/runtime behavior changes need relevant compatibility and deployment verification separately.
 
+CI also runs a pinned Trivy configuration scan (`aquasecurity/trivy-action`, `config` mode, HIGH/CRITICAL, exit 1) after `terraform init -backend=false`. It needs no AWS credentials. Reviewed, time-boxed exceptions are recorded in `.trivyignore.yaml` with a reason, owning role and expiry; they are not blanket file skips and are re-checked when they expire. The scan is intentionally CI-only: Trivy is not a local dependency, so `npm run check` is unchanged. Run it manually with `trivy config --severity HIGH,CRITICAL --exit-code 1 --ignorefile .trivyignore.yaml .` when the binary is installed. A reviewed plan still needs AWS credentials and remains an owner-only step; CI does not pretend to run one.
+
 Terraform semantic validation runs after package build because resource source hashes read the generated ZIP files. A clean checkout must rebuild the authorizer and rotation runtime archives before validating. The migration runner has a deliberately non-executable bootstrap handler: its ZIP is rebuilt from tracked `migration-runner/` source and must be replaced by the backend migration build before an actual migration invocation. It is not a substitute for either runtime archive.
 
 ## S-110 — Linux provider lock verification (29 October 2026)

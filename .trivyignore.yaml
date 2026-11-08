@@ -1,0 +1,78 @@
+# Reviewed, time-boxed exceptions for the CI misconfiguration scan.
+# Each entry records the reason and owning role; none is a blanket file skip.
+# Expired entries make the scan fail again so the owner must re-review them.
+# Story: INF-001.
+misconfigurations:
+    - id: AWS-0005
+      paths:
+          - "api-gateway.tf"
+      statement: >-
+          The custom domain `security_policy` is unset (provider default TLS 1.0).
+          Setting TLS_1_2 changes the reviewed API plan and needs an owner-reviewed
+          apply. Owner: platform owner. Re-review by 2027-03-31.
+      expired_at: 2027-03-31
+
+    - id: AWS-0104
+      paths:
+          - "lambda.tf"
+      statement: >-
+          The Lambda security group allows egress to 0.0.0.0/0 on TCP 443/5432 and
+          UDP 53. The function has no VPC endpoints, so narrowing needs a network
+          design change that affects runtime connectivity. Owner: platform owner.
+          Re-review by 2027-03-31.
+      expired_at: 2027-03-31
+
+    - id: AWS-0095
+      paths:
+          - "monitoring.tf"
+      statement: >-
+          The alarm SNS topic is unencrypted. Alarm payloads contain no personal
+          data, and adding KMS encryption is an owner-reviewed monitoring change.
+          Owner: platform owner. Re-review by 2027-03-31.
+      expired_at: 2027-03-31
+
+    - id: AWS-0086
+      paths:
+          - "s3.tf"
+      statement: >-
+          Public ACL blocking is disabled on `studup-website` because it is served
+          through the S3 website endpoint behind CloudFront, which requires public
+          access. Owner: platform owner. Re-review by 2027-03-31.
+      expired_at: 2027-03-31
+
+    - id: AWS-0087
+      paths:
+          - "s3.tf"
+      statement: >-
+          Public policy blocking is disabled on the public website/root-redirect
+          buckets (required for S3 website hosting) and on `stud-up-profile-images`
+          for its CloudFront OAI bucket policy. Owner: platform owner. Re-review by
+          2027-03-31.
+      expired_at: 2027-03-31
+
+    - id: AWS-0091
+      paths:
+          - "s3.tf"
+      statement: >-
+          Public ACLs are not ignored on the public `studup-website` bucket;
+          blocking them would break the S3 website origin. Owner: platform owner.
+          Re-review by 2027-03-31.
+      expired_at: 2027-03-31
+
+    - id: AWS-0093
+      paths:
+          - "s3.tf"
+      statement: >-
+          `studup-website` and `studup-root-redirect` must accept public reads for
+          S3 website hosting; CV files and profile images stay restricted. Owner:
+          platform owner. Re-review by 2027-03-31.
+      expired_at: 2027-03-31
+
+    - id: AWS-0132
+      paths:
+          - "s3.tf"
+      statement: >-
+          Buckets use SSE-S3 (AES256). Moving to a customer-managed KMS key adds a
+          new key resource and policy plus cost, outside this hygiene change.
+          Owner: platform owner / security owner. Re-review by 2027-03-31.
+      expired_at: 2027-03-31
