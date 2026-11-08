@@ -74,12 +74,9 @@ resource "aws_lambda_function" "db_password_rotation" {
     }
   }
 
-  lifecycle {
-    ignore_changes = [
-      filename,
-      source_code_hash,
-    ]
-  }
+  # No external deployer publishes this function: Terraform owns both the
+  # package path and its content hash (the ZIP is rebuilt deterministically by
+  # `npm run build`). Owner: infrastructure Terraform.
 }
 
 resource "aws_vpc_security_group_ingress_rule" "lambda_rds_postgres" {
@@ -106,9 +103,11 @@ resource "aws_secretsmanager_secret_rotation" "db_password" {
     automatically_after_days = 30
   }
 
+  # AWS normalises `secret_id` to the secret ARN after apply, while the config
+  # keeps the name; reasserting it would plan a spurious rotation replacement.
+  # The rotation schedule and secret value are owned by the rotation Lambda.
+  # Owner: platform owner / security owner.
   lifecycle {
-    ignore_changes = [
-      secret_id,
-    ]
+    ignore_changes = [secret_id]
   }
 }

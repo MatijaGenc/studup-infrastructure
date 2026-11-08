@@ -13,6 +13,9 @@ resource "aws_secretsmanager_secret_version" "app_database_password" {
   secret_id     = aws_secretsmanager_secret.app_database_password.id
   secret_string = random_password.app_database_password.result
 
+  # Value is generated once by `random_password`; the app-role password is then
+  # owned by the backend migration/bootstrap process, not continuously
+  # reconciled by Terraform. Owner: backend/data owner.
   lifecycle {
     ignore_changes = [secret_string]
   }
@@ -107,10 +110,11 @@ resource "aws_lambda_function" "db_migrator" {
 
   depends_on = [aws_cloudwatch_log_group.db_migrator]
 
+  # The backend migrate job replaces this handler with the built runner via
+  # `aws lambda update-function-code`; Terraform only seeds the placeholder ZIP.
+  # Ignore the CI-owned code hash, but keep Terraform ownership of the local
+  # placeholder path. Owner: backend release workflow.
   lifecycle {
-    ignore_changes = [
-      filename,
-      source_code_hash,
-    ]
+    ignore_changes = [source_code_hash]
   }
 }
