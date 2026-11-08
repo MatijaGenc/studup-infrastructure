@@ -126,6 +126,9 @@ review; EAS jobs stay opt-in and require repository credentials/`EXPO_TOKEN`.
 
 ## Release, rollback and recovery pointers
 
+- [INCIDENT_RECOVERY_RUNBOOK.md](INCIDENT_RECOVERY_RUNBOOK.md) — alarm sources,
+  deploy rollback, migration failure, DB PITR, secret rotation and S3/CV/avatar
+  recovery, including owner-only production steps.
 - [RELEASE_ROUTE_FIX.md](../RELEASE_ROUTE_FIX.md) — routing/release fix notes.
 - [github-oidc.tf](../github-oidc.tf) and [README](../README.md) — main-branch-scoped
   GitHub OIDC deploy roles.
