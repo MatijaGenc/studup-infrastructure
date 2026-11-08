@@ -9,6 +9,9 @@ does not prove what is deployed.
 - [docs/PROJECT.md](docs/PROJECT.md) — canonical versioned project map: repositories, source
   contracts, API boundaries, isolated test environments, quality gates, releases,
   rollback and known limitations.
+- [docs/INCIDENT_RECOVERY_RUNBOOK.md](docs/INCIDENT_RECOVERY_RUNBOOK.md) — detection
+  sources, deploy rollback, migration failure, DB PITR, secret rotation and S3/CV/avatar
+  recovery, with owners and production-only commands.
 - [docs/STATUS_GUIDE.md](docs/STATUS_GUIDE.md) — how this project distinguishes
   implemented, validated, merged, deployed and live-verified work.
 - [docs/chatgpt-tasks.md](docs/chatgpt-tasks.md) — canonical published task ledger
