@@ -29,6 +29,9 @@ jobs:
             - run: python3 -m venv .venv-quality
             - run: .venv-quality/bin/pip install -r requirements-quality.txt
             - run: terraform init -backend=false -lockfile=readonly
+            # Quality gates run on the clean checkout, before the scanner writes its
+            # downloaded policy cache, so formatting checks only see project files.
+            - run: npm run check
             - name: Security configuration scan (HIGH/CRITICAL)
               uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
               with:
@@ -40,8 +43,6 @@ jobs:
                   hide-progress: true
                   skip-dirs: node_modules,.terraform,.venv-quality,graphify-out
                   trivyignores: .trivyignore.yaml
-            - run: rm -rf .cache
-            - run: npm run check
             - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
                   name: lambda-packages
