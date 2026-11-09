@@ -4,6 +4,12 @@ Date: 8 November 2026. Branch: `INF-001-terraform-hygiene` (from main `d1e3a0f`)
 This change is code/documentation only. No AWS command, `terraform plan`, `terraform apply`,
 merge or push was performed by this task.
 
+> **Ownership inventory:** every remaining `ignore_changes` block, secret, log group,
+> S3 bucket/lifecycle rule, SNS topic/subscription and alarm — with its owner, review
+> date, required evidence and the open owner decisions — is now tracked in
+> [docs/OWNERSHIP_MATRIX.md](docs/OWNERSHIP_MATRIX.md). This file remains the change
+> record and gate log; the matrix is the reviewable inventory. Neither is live proof.
+
 ## 1. `ignore_changes` review
 
 Every existing block was inspected against its resource, the provider schema
@@ -38,8 +44,22 @@ Notes on plan semantics:
 
 ## 2. CI security/schema validation
 
-`.github/workflows/validate.yml` gains one step after
-`terraform init -backend=false -lockfile=readonly`:
+`.github/workflows/validate.yml` runs the security scan after
+`terraform init -backend=false -lockfile=readonly` and `npm run check`:
+
+Current ordering (verified against the workflow on 10 November 2026):
+
+1. `terraform init -backend=false -lockfile=readonly`
+2. `npm run check`
+3. Trivy `config` scan
+4. artifact upload
+
+The scan runs **after** the quality gates, on the same checkout. It does not delete a
+cache directory and the workflow does not exclude or remove project files for the scan;
+the only scan skips are the dependency/tooling directories listed below. This ordering
+must stay: if the scan ever runs first, its downloaded cache can break the formatting
+gate, and working around that by deleting or excluding files would hide project content
+from the gates instead of validating it.
 
 | Item           | Value                                                                                          |
 | -------------- | ---------------------------------------------------------------------------------------------- |
