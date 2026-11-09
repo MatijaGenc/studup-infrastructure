@@ -6,7 +6,7 @@
         "useIgnoreFile": true
     },
     "files": {
-        "includes": ["**", "!!authorizer/node_modules", "!!node_modules"]
+        "includes": ["**", "!!authorizer/node_modules", "!!node_modules", "!!.cache"]
     },
     "formatter": {
         "indentStyle": "space",
