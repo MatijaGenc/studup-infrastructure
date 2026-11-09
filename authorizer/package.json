@@ -4,7 +4,7 @@
     "private": true,
     "dependencies": {
         "jsonwebtoken": "^9.0.2",
-        "@aws-sdk/client-secrets-manager": "3.1161.0"
+        "@aws-sdk/client-secrets-manager": "3.1165.0"
     },
     "scripts": {
         "lint": "node --check index.mjs && node --check token-policy.mjs",
