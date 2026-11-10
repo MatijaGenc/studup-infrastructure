@@ -384,6 +384,7 @@ Acceptance criteria:
 **SEC-001 progress (1 November 2026): partially unblocked** — AWS access keys rotated/deactivated and CloudTrail reviewed. The legacy `github-actions` key is inactive, a new key is active, and the old `main-user`/`upload-profile-image-user` keys are inactive. GitHub PAT rotation, repository access-log review and GitHub secret-scanning/push-protection enablement still require repository-owner admin; the available `ghp_` token has only push/triage/pull on the `MatijaGenc` repositories, and secret-scanning endpoints return 404.
 
 Redacted inventory (labels only; no values recorded):
+
 - GitHub PAT A (`ghp_`, 40 chars): present in local `complete-tasks.md` and `codebase-audit-tasks.md` (replaced with placeholders), and embedded in the backend repository's local `.git/config` remote URL (removed; remote is now plain HTTPS and authenticated through the macOS keychain).
 - GitHub PAT B (`ghp_`, 40 chars): present in the same two local documents (replaced with placeholders); never present in tracked files or Git history of backend/frontend/mobile/shared.
 - AWS access key ID (`AKIA…`, 20 chars): present in the same two local documents (replaced with placeholders); never present in tracked files or history.
@@ -802,6 +803,7 @@ Evidence: frontend installed resolvers differ from declared/locked versions. Bac
 **DEP-001 completion (30 October 2026; merged/deployed 31 October 2026):** implemented, validated and merged to main on all four repositories. Strategy: migrate every consumer to Zod 4 (shared peer is `^4.0.0`). Installed graph is now Zod `4.6.7` in backend/frontend/mobile/shared; form resolvers are `@hookform/resolvers` `5.9.1` (frontend) and `5.9.2` (mobile); backend OpenAPI tooling is `@asteasolutions/zod-to-openapi` `9.1.0` with `OpenApiGeneratorV3`. All consumers pin `@studup/shared#1008e0f64617c98360c1418ef0e3abba04a5979f`. Mobile's lockfile still contains a nested `zod@3.25.76`, confirmed via `yarn why zod` to be `@expo/cli` tooling only; the app workspace resolves Zod `4.6.7`, so no shared-major object composition remains.
 
 Evidence (all gates run on the final pushed commits; `yarn install --immutable` / frozen installs passed):
+
 - Backend `DEP-001-reproducible-installs` → `eb32499eed8d6b396f5d575277445b13cd4a8190`; `pnpm check` exit 0 (318 Vitest + 5 scraper + 10 gate tests), including a Zod 4 `OpenApiGeneratorV3` spec smoke test (HTTP 200).
 - Frontend `DEP-001-reproducible-installs` → `45f29d9caa6207c877e44ebbda334bc0f3009386`; `yarn check` exit 0 (299 unit + 10 gate tests), `yarn install --immutable` pass.
 - Mobile `DEP-001-reproducible-installs` → `bbe46476e658c47f00281fcbcb003387f4411981`; `yarn check` exit 0 (61 unit + 10 gate tests), `yarn install --immutable` pass.
@@ -887,7 +889,6 @@ Original evidence below has been rechecked on 4 November: common input/dropdown 
 - [ ] Mandatory mobile gates, component interaction tests, contrast checks, and iOS/Android screenshot review pass before push.
 
 **MOB-001-A in progress (4 November):** reproduced near-invisible authentication Back icons in native dark mode; the shared header now uses the current semantic text token. Regression, full core gates (162 Jest +23 tooling), actual native rebuilds/source-map identity and light/dark registration/Back flows pass on both platforms. Commit `60b2813` is merged on main after passing the real pre-push gates; exact quality CI 41911558890 and secret scan 41911558796 succeed. This child repair is complete. The broader MOB-001 criteria above remain open.
-
 
 **Owner refinement (6 November):** use “Alarmi” instead of “Alerti” in Croatian mobile navigation and corresponding flows. Inspect the reported mobile wrapping and oversized fields on real simulator screens; reduce unnecessary padding/vertical space while retaining readable text, usable touch targets, contrast and large-text expansion. Keep Google/Apple sign-in scope under AUTH-001; provider configuration and secure account linking remain required.
 
@@ -1262,7 +1263,6 @@ Deployed: no | yes
 Live-verified: no | yes
 ```
 
-
 ### FE-010 — Frontend styling release (24 October 2026)
 
 **Status:** DONE — implemented and locally validated. Main-branch publication is recorded below after push; deployment/live verification remain separate.
@@ -1285,7 +1285,6 @@ Scope: public pages at 320/375/768/1024/1440px; synthetic student/employer empty
 
 Publication: **pushed to main** on 24 October 2026, commit `06f69c91f` (`ce3bf49ff..06f69c91f`). All listed local gates passed before push. Formatting, staged diff whitespace and staged secret-pattern checks also passed. Production deployment was subsequently repaired and verified by FE-011.
 
-
 ### FE-011 — Repair styling deployment and platform-specific visual tests
 
 **Status:** DONE — implemented, validated, pushed, deployed and live-verified. The FE-010 commit was pushed successfully but its deployment failed: Linux CI compared macOS screenshots and blocked release. The previous broken auth UI therefore remained live.
@@ -1300,7 +1299,6 @@ Acceptance criteria:
 - [x] Push to main, verify the deployment workflow succeeds and inspect the live auth page.
 
 FE-011 completion: commit `48972f954` pushed to main. Both local browser platforms passed all 8 scenarios without updating references; typecheck/lint/build/55 unit tests/27 contrast pairs/formatting/staged secret-pattern checks passed. GitHub workflow [40037005129](https://github.com/MatijaGenc/student-employer-frontend/actions/runs/40037005129) completed validation and deployment successfully, including S3 sync and CloudFront invalidation. Reloaded `https://www.studup.net/auth` and visually confirmed the new labeled, readable, separated controls. Proof: `/private/tmp/studup-auth-live-fixed.png`. No production account was created or modified.
-
 
 ### FE-012 — Finish routed frontend page styling and contrast, page by page
 
@@ -1322,7 +1320,6 @@ Scope and limits: frontend `FRONTEND_PAGE_AUDIT.md`. Manual screen-reader/200% z
 FE-012 local validation: 58 unit tests across 15 files; 37 contrast pairs; 23 Playwright scenarios on each macOS/Linux platform without reference updates; typecheck/lint/build/formatting/staged secret-pattern and whitespace checks passed. Earlier FE stories remain partially open wherever unchecked; implementation checkmarks are not a claim that the entire project backlog is complete.
 
 FE-012 publication: commit `7341b2a23` pushed to main. Workflow [40066796672](https://github.com/MatijaGenc/student-employer-frontend/actions/runs/40066796672) passed every validation step and deployment, including S3 sync and CloudFront invalidation. Live `/privacy` now exposes the repaired H1/H2 hierarchy; `/resources/profile-img-default.svg` serves the new accessible avatar. Public screenshot proof: `/private/tmp/studup-privacy-live-verified.png`. Authenticated pages were checked using synthetic fixtures, not production accounts. FE-012 is complete within its documented scope; unchecked manual accessibility, native mobile, backend, security and infrastructure items remain open.
-
 
 ### PRIV-002 — Registration privacy notice and consent correction (S-077)
 
@@ -1434,7 +1431,6 @@ PRIV-002 was merged during the all-branch sweep, then reverted from `main` becau
 - [ ] CV production transport/privacy: verify API/Lambda request limits against the advertised 10 MB file size; design a presigned upload flow if required, inspect file content beyond declared MIME, and use authorized CV download access with appropriate retention/deletion. URL-only upload tests are insufficient. Acceptance: real file round-trip and access-control tests on deployed infrastructure.
 - [x] Concurrent employer approval capacity is already serialized per job on verified main. `editJobApplicationStatus` locks the job row with `FOR UPDATE`, rereads capacity, conditionally updates only APPLIED applications and commits notifications in the same transaction. Existing PostgreSQL NORMAL/FAST concurrency tests verify one winner at capacity, terminal conflict behavior, rejection counts and notification consistency; those files are unchanged from backend `89d173d`, whose full486-integration-test CI/deploy passed. This does not claim the separate unmerged FCFS/lifecycle feature is complete.
 
-
 ## Final verification checkpoint for this continuation
 
 - [x] Existing frontend feature/test commits reconciled: branch `S-101-integrate-frontend-tests`, merge `d25b68d1a`, pushed. 227 tests/47 files, lint/typecheck/build/contrast checks pass. 35 Darwin browser cases pass; affected Linux cases pass with one unchanged isolated retry after a load timeout.
@@ -1443,7 +1439,6 @@ PRIV-002 was merged during the all-branch sweep, then reverted from `main` becau
 - [ ] Publish the new frontend/backend feature branches after the production schema/baseline and rollout dependencies are resolved. This continuation did not push new feature code to main or deploy the backend bundle.
 - [ ] Complete real-account production login/search/alert verification, native Android device testing and physical-device push delivery. Local fixtures and successful exports do not replace these release checks.
 - [ ] Confirm legal controller identity/contact, actual retention/transfers and business-model classification before finalizing the privacy notice. The existing privacy draft remains unpublished.
-
 
 ## Production feature migrations applied — 24 October 2026
 
@@ -1457,6 +1452,7 @@ PRIV-002 was merged during the all-branch sweep, then reverted from `main` becau
 Status: historical diagnosis superseded in part by REL-001. Production now has migration history managed by the validated private migrator; 25 migrations were replayed in the RCH-012 check. Do not rerun initial migrations. The original restored-snapshot/Prisma-CLI proof and recovery-drill criteria below are not automatically marked complete by the custom migrator rollout.
 
 Acceptance criteria:
+
 - Create and verify a current recovery snapshot; perform the baseline exercise on a restored isolated database first.
 - Compare the actual production/restored schema with the repository's migration history, including enums, columns/nullability, indexes and constraints. Document every difference and reconcile it with reviewed additive migrations.
 - Use Prisma's supported baseline/resolve workflow only after proving which migrations are represented. Preserve original migration files/checksums; never fabricate successful history or reset production.
@@ -1471,6 +1467,7 @@ Status: implemented, merged to main and deployed (web `5e9fb183f`, mobile `51993
 Story: As a student or employer, I can select Light, Dark or System appearance and keep my choice after restarting, while reading text and using controls clearly in either mode.
 
 Acceptance criteria:
+
 - Web navigation and mobile Više → Izgled settings expose labelled Light / Dark / System controls with meaningful selection state and usable touch targets. Per the 4 November request/MOB-014, mobile login and first screens follow the saved/System preference without a prominent theme-button group.
 - Preferences persist locally; System follows device changes, and explicit Light/Dark overrides it. Switching does not reset navigation or typed forms.
 - Both palettes meet at least 4.5:1 for normal text and 3:1 for meaningful control boundaries, icons and focus indicators on their supported surfaces. Filled buttons retain contrasting labels; errors, disabled fields, menus, dialogs, dropdowns and placeholders are reviewed.
@@ -1479,6 +1476,7 @@ Acceptance criteria:
 - Publishing remains a separate release action; preserve the prior feature branches and migration audit.
 
 S-104 verification evidence:
+
 - [x] Web and mobile persisted Light/Dark/System controls implemented; switching retains unfinished form input. Web/Android persistence and placement are verified; the 4 November unsigned iOS preview counterexample was corrected in mobile `47ea1f8` with rendered-state assertions.
 - [x] Both palette contrast checks pass; foreground accents, control borders/focus, filled-button labels, errors and loading indicators use the appropriate colors.
 - [x] Web lint/typecheck/build/229 tests and six final dark browser cases pass; all 35 Linux light cases pass.
@@ -1519,6 +1517,7 @@ All five remote main refs were verified equal to the tested task heads. Updates 
 - [x] Record before/after branch tips and backup locations under branch-audit-2026-10-25/.
 
 S-106 completion evidence:
+
 - [x] Review and update only the stale Linux student-avatar-dialog-320.png baseline, retaining the original visual tolerance.
 - [x] Three consecutive readonly passes of the previously failing scenario.
 - [x] Final complete CI=true Linux run: all 229 tests, all 41 browser cases, contrast checks, lint/typecheck/format checks and production/PWA build passed.
@@ -1534,7 +1533,6 @@ Status: done. Commit 47422786c is pushed to main and the remote head is verified
 - [x] All 229 tests and all 53 readonly macOS browser scenarios pass, together with lint/typecheck/contrast/build.
 - [x] Final Linux readonly checks pass: 229 tests, all 53 browser scenarios, contrast checks, lint/typecheck/format checks and production/PWA build. Main push and temporary-branch cleanup are complete.
 
-
 ## 31 October 2026 — completion and visual reconciliation
 
 - **Web production public surfaces inspected:** `/landing`, `/privacy`, `/auth?mode=login`, both registration roles, reset, verification and the unknown-URL page rendered at 1440px and 390px with no page errors, broken assets or horizontal overflow. Known routes now return HTTP 200 through CloudFront while unknown URLs keep HTTP 404 and render the SPA not-found page.
@@ -1543,8 +1541,6 @@ Status: done. Commit 47422786c is pushed to main and the remote head is verified
 - **Marked-complete status correction:** SEC-002–SEC-005, API-001 P0, API-003/004, DATA-001/002 and DEP-001 are on main and deployed, not merely review branches. API-002 and SEC-006 infrastructure are merged but their Terraform plan is not applied. S-104 and S-122 are deployed, not pending.
 - **Not marked complete despite being present:** owner actions for SEC-001, compliance facts for PRIV-001/PRIV-002/LEGAL-003, shared executable contract schema and full journey fixture for API-001, shared `ApplicationStatus` string/number reconciliation for DATA-001, native mobile parity, and production push delivery.
 - **FE-007 groups 3–5, FE-008 rendered-state evidence, FE-009 and the native iOS public baseline are complete:** see the final reconciliation below.
-
-
 
 ## 31 October 2026 — final FE-007/FE-008/FE-009, native and infrastructure closeout
 
@@ -1555,7 +1551,6 @@ Status: done. Commit 47422786c is pushed to main and the remote head is verified
 - **Publication:** frontend `f22f99dab`, `ecd5fe6aa`, `158160bff`; deploy run 41255852469 succeeded. Infrastructure `51d985a` plus `6e0e2cd`; CloudFront SPA routing, API-002/SEC-006 resources and explicit Lambda DB endpoint variables are live.
 - **Live smoke:** `/auth` 200, `/privacy` 200, `/missing-page` 404 with Back, `/home` redirects to login with session message, public API 200, private OPTIONS 200 with exact origin/credentials/PATCH, anonymous private 401.
 - **Owner-blocked:** PRIV-001/PRIV-002/LEGAL-003 need controller/lawful-basis/retention/recipient/processor/transfer facts and final copy; SEC-001 needs credential rotation/access-log review. RDS gp3 remains a pending maintenance-window change.
-
 
 ## Independent recheck — 1 November 2026
 
@@ -1580,8 +1575,6 @@ Later follow-ups **RCH-009–RCH-016** are recorded in the dated sections below;
 
 PROD-001 remains partial: backend `a1c8764`, frontend `f2c4080b8`, and mobile `b2410b9` are each one commit ahead of their remote main, and were preserved. Physical Android/iOS, authenticated native acceptance, production push receipt/tap, manual screen-reader testing and owner-blocked credential/privacy work remain unverified/open. Evidence: `<workspace>/recheck-2026-11-01/evidence/`.
 
-
-
 ## 1 November 2026 — RCH-002/RCH-003 encrypted session idempotency
 
 - Backend main `1c9b4f5`; backend run [41345443806](https://github.com/MatijaGenc/student-employer-backend/actions/runs/41345443806) passed validate/build/migrate/deploy/smoke, and task-branch CI [41344107340](https://github.com/MatijaGenc/student-employer-backend/actions/runs/41344107340) passed.
@@ -1590,8 +1583,6 @@ PROD-001 remains partial: backend `a1c8764`, frontend `f2c4080b8`, and mobile `b
 - Real-dispatcher regressions cover mobile login at rest, browser login cookie replay followed by refresh, mobile refresh replay without double rotation, and logout cookie-clearing replay. The new tests also prove stored ciphertext does not contain the issued refresh token.
 - Gates: backend `pnpm check` passes with 582 tests + 5 scraper tests + 16 gate tests; secret scan clean. The migrator logged `Applied 1 of 23 migrations`; live `/open-api/job-categories` and `/open-api/health` return 200, anonymous `/open-api/jobs` returns 401, and deployed `DataHandler` reports `nodejs26.x`.
 
-
-
 ## 1 November 2026 — RCH-004 transient idempotency recovery
 
 - Backend main `7f28ac9`; backend run [41346849875](https://github.com/MatijaGenc/student-employer-backend/actions/runs/41346849875) passed validate/build/migrate/deploy/smoke; task-branch CI 41346591478 passed.
@@ -1599,8 +1590,6 @@ PROD-001 remains partial: backend `a1c8764`, frontend `f2c4080b8`, and mobile `b
 - PROCESSING reservations use a 60-second lease, longer than the 30-second Lambda timeout. Interrupted reservations older than the lease can be taken over; completed responses still use the 24-hour TTL.
 - Added returned-5xx coverage for 500/502/503/504 and a stale-PROCESSING recovery regression. Backend `pnpm check`: 582 tests + 5 scrapers + 16 gate tests; secret scan clean.
 - Live verification after deploy: `/open-api/job-categories` 200, `/open-api/health` 200, anonymous `/open-api/jobs` 401, deployed `DataHandler` runtime `nodejs26.x`.
-
-
 
 ## 1 November 2026 — RCH-005 accessible rating dialog and admin regions
 
@@ -1611,8 +1600,6 @@ PROD-001 remains partial: backend `a1c8764`, frontend `f2c4080b8`, and mobile `b
 - Gates: frontend `yarn check` 328 tests + 16 gate tests; `yarn check:ui` 184/184 browser cases; 8/8 targeted audit cases; secret scan clean.
 - Live verification: `/`, `/auth`, `/privacy` return 200, unknown URL 404; the deployed `application-page-Cz4VXzIx.js` contains the new dialog title and admin region identifiers.
 
-
-
 ## 1 November 2026 — RCH-006 independent outbox worker
 
 - Backend main `4cfaa1a`; backend runs [41354992631](https://github.com/MatijaGenc/student-employer-backend/actions/runs/41354992631) and [41357645327](https://github.com/MatijaGenc/student-employer-backend/actions/runs/41357645327) passed validate/build/migrate/deploy/smoke. Infrastructure main `37c5907`; validate run [41356994451](https://github.com/MatijaGenc/studup-infrastructure/actions/runs/41356994451) passed.
@@ -1621,14 +1608,12 @@ PROD-001 remains partial: backend `a1c8764`, frontend `f2c4080b8`, and mobile `b
 - Regression coverage: hanging provider does not delay `/health`; failed delivery retries on a later worker run without API traffic; 5-event backlog drains across batches; terminal failure requeues and sends. Backend `pnpm check`: 586 tests + 5 scraper + 16 gate tests.
 - Live: EventBridge rule enabled (`rate(1 minute)`), worker invocations every minute logged with `failed:0`, worker errors and delivery-failure alarms both `OK`; logs required a dedicated worker log-group IAM policy.
 
-
 ## 2 November 2026 — RCH-007 notification destinations
 
 - Web main `2760dd8b6` opens validated notification job links in a named, themed dialog, preserves the job through login, waits for cookie restoration, and supports history/Back, retry, missing/deleted targets and employer ownership feedback. `yarn check`: 352 unit + 16 gate tests; `yarn check:ui`: 110 contrast assertions and 200 browser cases pass. Existing screenshot baselines were preserved.
 - Mobile main `3cdea42` handles warm/cold notification targets across authentication, selects Home, opens job details, supports notification-history actions, cancels stale lookups and persists dismissed native identifiers. `yarn check`: 121 tests + 16 gate tests, application/test typecheck, lint and all-platform JS export pass. GitHub checks [41361743312](https://github.com/MatijaGenc/student-employer-mobile/actions/runs/41361743312) pass.
 - **Remaining acceptance:** signed iOS/Android builds and real push receipt/tap, cold/warm login handoff and authenticated native visual proof. Simulator availability and JS exports are not that proof. RCH-007/MOB-003 therefore remain partial. Web [41361997953](https://github.com/MatijaGenc/student-employer-frontend/actions/runs/41361997953) passed validation/deploy/smoke (200 browser + 3 journey cases); the live anonymous job link preserves its UUID through login handoff. Authenticated production accounts were not used.
 - Evidence: `<workspace>/recheck-fixes-2026-11-01/RCH-007/`. Implementation notes are committed in each repository as `RCH007_NOTIFICATION_LINKS.md`.
-
 
 ## RCH-009 — P1: protect cached request fingerprints
 
@@ -1644,7 +1629,6 @@ Acceptance criteria:
 
 Status: DONE — backend main `e897214`, CI/deploy [41364693282](https://github.com/MatijaGenc/student-employer-backend/actions/runs/41364693282) green. `pnpm check` and pre-push pass 607 tests + 5 scraper + 16 gate tests, typecheck/lint/build/secret scan. Live worker protected 100 then 24 legacy rows; a later invocation reports 0, after old API instances drained. Successful/processing entries retain responses, timestamps and semantics. No schema migration/new permissions were needed; this is a bounded runtime-keyed data migration. Synthetic evidence: `<workspace>/recheck-fixes-2026-11-01/RCH-009/`.
 
-
 ## RCH-010 — P1: make new-job watchlist matching recoverable
 
 Further source review found that `createJob` commits the job and then calls `matchJobAlerts` with a catch-and-log fallback. The push worker can recover already-enqueued notifications, but it cannot recover an alert match that never ran or failed before creating those notifications. This leaves a crash/failure window where a published job never reaches matching students. The fault-injection regression reproduced this gap; the completed repair and evidence are recorded below.
@@ -1659,7 +1643,6 @@ Acceptance criteria:
 
 Status: DONE — backend main `a1fd3bd`; Actions 41396409277 validate/build/migrate/deploy/smoke passed. 615 tests, 5 scraper tests, 16 gate tests, full quality checks and fresh 23-migration replay passed. Job plus durable matching intent commit atomically; bounded, resumable matching is independently retried with per-job/student deduplication. Snapshot/unsubscribe behavior is documented in `RCH010_WATCHLIST_RECOVERY.md`. Evidence: `recheck-fixes-2026-11-01/RCH-010/`.
 
-
 ## 2 November 2026 — RCH-008 durable audit recovery complete
 
 - Backend main `373ab4d` + credential-rotation follow-up `ea5af89`; final [41363921402](https://github.com/MatijaGenc/student-employer-backend/actions/runs/41363921402) passed validate/build/migrate/deploy/smoke.
@@ -1668,7 +1651,6 @@ Status: DONE — backend main `a1fd3bd`; Actions 41396409277 validate/build/migr
 - Full local gate (also repeated by pre-push): 598 tests, 5 scraper tests, 16 gate tests, typecheck, formatting/lint and production bundle pass. All 23 migrations applied to a fresh disposable local database. Secret scan clean.
 - Both deployed functions report nodejs26.x / Active / Successful and identical code SHA. No production test account/job was created. Runbook: backend `RCH008_AUDIT_RECOVERY.md`. Evidence: `<workspace>/recheck-fixes-2026-11-01/RCH-008/`.
 - Further recheck findings RCH-009 (request fingerprints) and RCH-010 (watchlist matching durability) remain separately tracked; native acceptance stays open under RCH-007/MOB-003.
-
 
 ## RCH-011 — P1: do not blindly rerun an uncertain committed mutation
 
@@ -1683,7 +1665,6 @@ Acceptance criteria:
 - [x] Fresh Prisma migration replay, full checks and exact-commit CI/deployment pass before completion.
 
 Status: DONE — backend main `88bc4f6`; Actions 41398744613 validate/build/migrate/deploy/smoke passed. 624 tests, 5 scraper tests, 16 gate tests and fresh 24-migration replay passed. UNCERTAIN outcomes prevent automatic stale-lease takeover for the documented 24-hour window; trusted pre-execution failures alone release the key. Metadata-only audit correlation supports reconciliation. See `RCH011_UNCERTAIN_MUTATIONS.md` and `recheck-fixes-2026-11-01/RCH-011/`. Historical outcomes are not guessed or re-executed.
-
 
 ## RCH-012 — P1: safe push transports and subscription ownership
 
@@ -1744,7 +1725,6 @@ Acceptance criteria:
 
 Status: DONE — infrastructure main `91aa33e`; Actions 41511650487 passes. Full local/pre-push infrastructure gates pass, including Terraform validation with nodejs26.x and authorizer/rotation/gate tests. Read-only live runtime metadata agrees. No Terraform apply or authorizer change was performed. Broader INF-001 remains open. Notes: `RCH015_RUNTIME_DECLARATIONS.md`; evidence: `recheck-fixes-2026-11-01/RCH-015/`.
 
-
 ## RCH-016 — P1: safe push diagnostics and native registration acknowledgements
 
 Native HTTP diagnostics include the concrete request path. Unregister-device-token paths embed a provider token, and browser unregistration paths can embed a private push endpoint. Reproduce with synthetic identifiers; never print or send real tokens in regression evidence.
@@ -1759,7 +1739,6 @@ Acceptance criteria:
 
 Status: DONE — mobile main `9608a68`, frontend main `8c40182a4`; all local/pre-push gates pass (124 mobile / 363 frontend tests plus 16 gate tests each, typecheck, formatting/lint and builds). Mobile Actions 41512277299 and frontend Actions 41512291375 pass; frontend validate/deploy/smoke and both secret scans are green. Browser coverage passed 200 responsive/accessibility cases plus 3 isolated journeys. Four native-review text artifacts were sanitized; owned review/test resources were cleaned up. Notes: `RCH016_PUSH_DIAGNOSTICS.md`; evidence: `recheck-fixes-2026-11-01/RCH-016/`.
 
-
 ## 2 November 2026 — latest recheck snapshot
 
 - Backend main `f9996f8`: RCH-008–012 code repairs and exact-commit deployments pass. Latest suite: 644 tests, 5 scraper tests, 16 gates; 25 migrations replayed fresh. Production worker metadata/code identity and clean scheduled completion logs verified without creating production jobs.
@@ -1769,7 +1748,6 @@ Status: DONE — mobile main `9608a68`, frontend main `8c40182a4`; all local/pre
 - Preserved unfinished PROD-001/privacy/other branches and original dirty checkouts. Original manual/owner-dependent acceptance remains open, including signed iOS/Android delivery/tap, Android device review, manual screen-reader review, privacy-controller facts and credential revocation verification. These are not marked complete by code checks or Expo Go captures.
 
 Additional final native check: `CI=1 yarn expo install --check` reports “Dependencies are up to date” on mobile `9608a68`, with no file changes. This verifies installed SDK package compatibility, not signed native compilation or device delivery.
-
 
 ## RCH-017 — P1: validate complete image payloads and deployable decoder packaging
 
@@ -1783,7 +1761,6 @@ Found during the full 3 November task/branch audit. BE-003 marked complete corru
 
 Status: **DONE** — implemented, validated, merged, deployed and operationally smoke-verified to backend main `a675113` from `S-139-image-integrity` (initial local branch name `RCH-017-image-integrity`). Final checks pass 660 tests / 119 suites, 5 scrapers and 16 tooling tests, typecheck/format/lint/build; 35 configured warnings match the baseline. Frozen install and network-disabled Linux/x64 Node 26/256MB decoder plus compiled-handler smoke pass (224128 KiB peak RSS); the recursive 14.1 MB ZIP includes native libraries without symlinks. Secret scan passes. Exact-commit CI 41594455973 passed Validate/Build/Migrate/Deploy/Smoke; secret scan 41594456019 passed. Both live functions are Active/Successful on Node 26/x86_64 and match release code hash `AE8eeO2O1B4ge4QtOwJnSpPodSoUaLxjpUc3opRxc1k=`. Public health/categories and anonymous-job auth smoke pass. No production test image/account/job was created; broader BE-003/MOB-005 remain open.
 
-
 ## Independent task/branch reconciliation — 3 November 2026
 
 The entire previous 1,627-line document was rescanned against current source, all local/remote branch refs, active worktree status, fresh checks and exact-main Actions. Detailed findings — local evidence: `<workspace>/recheck-report-2026-11-03.md` (not published); evidence: `recheck-fixes-2026-11-03/`. Stale checkmarks and stale open items are corrected in their stories. Historical dated checkpoints remain provenance, not current blockers. All 14 local Markdown links resolve.
@@ -1793,7 +1770,6 @@ Completed mobile native-review history is merged to main (`9f6d3cc`), with scope
 Fresh source checks: web 363 tests + 16 gates and 200 UI cases; mobile SDK 58 130 tests + 22 gates/all-platform export; shared and infrastructure full checks pass. The backend baseline was 648 + 5 + 16; RCH-017 final is 660 + 5 + 16. The validation run also exposed and repaired eager real Secrets Manager bootstrap in the test harness, a duplicate-email high-fanout fixture, and missing target revalidation at adapter/wipe time. Real loader/rotation tests retain controlled AWS transports. TEST-003 remains partial for DB-free unit separation and stronger disposable-instance identity; none of those broader criteria were automatically checked.
 
 Final 3 November delivery: mobile `09e3454` (Actions 41590614770) and backend `a675113` (Actions 41594455973) are on main and green. All pre-audit main tips remain ancestors. Original untracked tests and dirty worktrees were preserved. Only the owned `studup-audit-20261103` database container is removed after verification; no existing database is reset. The prior native review keyboard setting was restored and the owned emulator stopped.
-
 
 ## New requests — 4 November 2026
 
@@ -1830,7 +1806,6 @@ Status: **PROPOSED — feasibility requested; implementation is not yet approved
 - [ ] All affected repository quality gates, migration checks and local Android/iOS/web end-to-end checks pass before merging/pushing; record setup and release limitations separately from completed implementation.
 
 Reference requirements: [Apple App Review login services](https://developer.apple.com/app-store/review/guidelines/#login-services); [Google backend token verification](https://developers.google.com/identity/sign-in/web/backend-auth).
-
 
 ## Independent reconciliation — 4 November 2026
 
@@ -2003,7 +1978,6 @@ Local evidence: `recheck-fixes-2026-11-05/mobile-unused-navigation-peer/`; commi
 - [x] Backend main `f9f2559`; [Backend42069299040](https://github.com/MatijaGenc/student-employer-backend/actions/runs/42069299040) and [secret scan42069299334](https://github.com/MatijaGenc/student-employer-backend/actions/runs/42069299334) succeed. Committed `S148_PROFILE_INTERNAL_FIELDS.md`; local proof `recheck-fixes-2026-11-05/S148/`.
 
 At the S148 checkpoint contact/CV/certificate visibility still awaited a product decision. The user subsequently chose access only after applying, implemented in S150/S151 below. Employer OIB/address and public verification policy still need a separate decision; BE-001 remains open. This delivery does not establish legal compliance or signed-provider/device acceptance. The broad role matrix remains a proposal.
-
 
 ### Verified continuation — 5 November 2026
 
