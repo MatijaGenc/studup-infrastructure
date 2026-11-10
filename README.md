@@ -12,6 +12,13 @@ does not prove what is deployed.
 - [docs/INCIDENT_RECOVERY_RUNBOOK.md](docs/INCIDENT_RECOVERY_RUNBOOK.md) — detection
   sources, deploy rollback, migration failure, DB PITR, secret rotation and S3/CV/avatar
   recovery, with owners and production-only commands.
+- [docs/OWNERSHIP_MATRIX.md](docs/OWNERSHIP_MATRIX.md) — who owns each remaining drift
+  exception, secret, log group, S3 bucket, SNS subscription and alarm, plus the open
+  egress/logging/storage/state-lock/monitoring decisions.
+- [docs/SLO_AND_ALERTING.md](docs/SLO_AND_ALERTING.md) — draft availability, latency,
+  error, DB-pool and job-delivery objectives with proposed burn rules, routing
+  placeholders, the missing crash-reporting decision and the live drills still required.
+  Not ratified and not live.
 - [docs/STATUS_GUIDE.md](docs/STATUS_GUIDE.md) — how this project distinguishes
   implemented, validated, merged, deployed and live-verified work.
 - [docs/chatgpt-tasks.md](docs/chatgpt-tasks.md) — canonical published task ledger

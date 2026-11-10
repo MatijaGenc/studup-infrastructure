@@ -129,6 +129,12 @@ review; EAS jobs stay opt-in and require repository credentials/`EXPO_TOKEN`.
 - [INCIDENT_RECOVERY_RUNBOOK.md](INCIDENT_RECOVERY_RUNBOOK.md) — alarm sources,
   deploy rollback, migration failure, DB PITR, secret rotation and S3/CV/avatar
   recovery, including owner-only production steps.
+- [OWNERSHIP_MATRIX.md](OWNERSHIP_MATRIX.md) — drift, secret, log-group, S3, SNS and
+  alarm ownership, with review dates and the undecided egress/logging/storage/
+  state-lock/monitoring decisions.
+- [SLO_AND_ALERTING.md](SLO_AND_ALERTING.md) — proposed objectives, burn rules,
+  routing placeholders, crash-reporting decision and required live drills. Draft; not
+  live or ratified.
 - [RELEASE_ROUTE_FIX.md](../RELEASE_ROUTE_FIX.md) — routing/release fix notes.
 - [github-oidc.tf](../github-oidc.tf) and [README](../README.md) — main-branch-scoped
   GitHub OIDC deploy roles.
