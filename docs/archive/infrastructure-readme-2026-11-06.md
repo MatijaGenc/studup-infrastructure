@@ -83,11 +83,13 @@ Terraform-managed AWS infrastructure for the StudUp platform.
 ### Infrastructure (terraform plan NOT verified)
 
 The cert validation changes in `acm.tf` were committed but `terraform plan` could **not** be run because AWS CLI authentication is broken. The `aws login` command opens a browser flow but the OAuth grant consistently fails with:
+
 ```
 The provided authorization grant is invalid, expired, revoked, or malformed
 ```
 
 **To fix**: Run `terraform plan` manually after reauthenticating via:
+
 ```bash
 aws sso login
 # or
@@ -163,11 +165,13 @@ Node 26 deprecates the built-in `punycode` module. Transitive deps (`psl`, `uri-
 ### Infrastructure (terraform plan NOT verified)
 
 The cert validation changes in `acm.tf` were committed but `terraform plan` could **not** be run because AWS CLI authentication is broken. The `aws login` command opens a browser flow but the OAuth grant consistently fails with:
+
 ```
 The provided authorization grant is invalid, expired, revoked, or malformed
 ```
 
 **To fix**: Run `terraform plan` manually after reauthenticating via:
+
 ```bash
 aws sso login
 # or
@@ -248,6 +252,7 @@ State is stored remotely in S3 (`studup-terraform-state`) — no manual state fi
 ## Secrets
 
 Secrets are never stored in version control:
+
 - **Local**: `terraform.tfvars` (gitignored)
 - **CI**: GitHub Actions Secrets
 - **Production**: AWS Secrets Manager (Lambda fetches at cold start)
