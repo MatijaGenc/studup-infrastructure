@@ -38,7 +38,7 @@
             {
                 "license": "MIT",
                 "name": "ruff",
-                "version": "0.17.3"
+                "version": "0.17.4"
             },
             {
                 "license": "PSF-2.0",
@@ -63,12 +63,12 @@
             {
                 "license": "Apache-2.0",
                 "name": "boto3",
-                "version": "1.43.123"
+                "version": "1.43.126"
             },
             {
                 "license": "Apache-2.0",
                 "name": "botocore",
-                "version": "1.43.123"
+                "version": "1.43.126"
             },
             {
                 "license": "License :: OSI Approved :: MIT License",
