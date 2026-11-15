@@ -31,10 +31,10 @@ jobs:
             - name: Cache Terraform providers
               uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
-                  path: .terraform
-                  key: terraform-providers-${{ runner.os }}-${{ hashFiles('.terraform.lock.hcl') }}
+                  path: .terraform/providers
+                  key: terraform-plugins-v1-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('.terraform.lock.hcl') }}
                   restore-keys: |
-                      terraform-providers-${{ runner.os }}-
+                      terraform-plugins-v1-${{ runner.os }}-${{ runner.arch }}-
             - run: npm ci --ignore-scripts
             - run: npm --prefix authorizer ci
             - run: python3 -m venv .venv-quality
@@ -57,6 +57,7 @@ jobs:
             - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
                   name: lambda-packages
+                  retention-days: 14
                   path: |
                       authorizer.zip
                       migration-runner-placeholder.zip

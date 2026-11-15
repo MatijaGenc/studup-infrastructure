@@ -8,6 +8,8 @@ CI calls the same command. The pre-push hook runs it for code updates, including
 
 Before marking a task done, attach its commands, outcomes, test counts, relevant platform/environment, and any inapplicable checks with reasons. Record implementation, local validation, push, CI, deployment and live verification separately. Review the diff and scan staged changes for secrets before push. UI, database, infrastructure and native changes also require the applicable checks below.
 
+Run `npm run secret:scan` locally to check tracked files in the working tree. The **Scan tracked files for credentials** CI job runs the same scanner on pushes and pull requests. It reports the path, line and rule with a masked value. Review Terraform variables and credential assignments explicitly because pattern matching covers known token formats and private key headers. Git history needs a separate scan.
+
 ## Infrastructure and Lambda packages
 
 Install Node dependencies using `npm ci` and `npm --prefix authorizer ci`. Use Python 3.12: `python3 -m venv .venv-quality` then `.venv-quality/bin/pip install -r requirements-quality.txt`. Initialize Terraform schemas using `terraform init -backend=false -lockfile=readonly` in a clean validation checkout, then run `npm run check`. Do not reconfigure an active production backend merely to validate.
