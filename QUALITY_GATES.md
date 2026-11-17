@@ -4,6 +4,8 @@ Use Node 26 and npm 11. Install from the committed lockfile, then run `npm run c
 
 CI calls the same command. The pre-push hook runs it for code updates, including main; deletion-only updates contain no code to validate. Install dependencies to install the hook (Husky in app repositories; `prepare` in shared/infrastructure). Do not bypass hooks or treat a local pass as evidence that remote CI/deployment succeeded.
 
+Full CI validation runs on pull requests and manual dispatches. Main revisions are checked every two hours at minute 27 UTC. Scheduled runs reuse a previous successful validation only for the exact revision and a completed successful `validate` job. A skipped job cannot satisfy this check. Actions API failures fail the scheduling gate. Manual dispatch always runs the full checks for the selected revision. Secret scanning and workflow lint continue on every push.
+
 `test:gates` injects real failing child processes at each of the typecheck/lint/build/test positions, verifies later commands stop, rejects missing configuration/executables, and exercises the actual hook with a failing package manager and deletion-only input. These tests verify failure propagation; they supplement each tool's normal checks.
 
 Before marking a task done, attach its commands, outcomes, test counts, relevant platform/environment, and any inapplicable checks with reasons. Record implementation, local validation, push, CI, deployment and live verification separately. Review the diff and scan staged changes for secrets before push. UI, database, infrastructure and native changes also require the applicable checks below.

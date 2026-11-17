@@ -1,7 +1,7 @@
 name: Validate infrastructure and Lambda packages
 on:
-    push:
-        branches: [main]
+    schedule:
+        - cron: "27 */2 * * *"
     pull_request:
     workflow_dispatch:
 permissions:
@@ -12,7 +12,51 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+    validation-needed:
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        permissions:
+            contents: read
+            actions: read
+        outputs:
+            run: ${{ steps.check.outputs.run }}
+        steps:
+            - name: Check whether this main revision already passed validation
+              id: check
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+              with:
+                  script: |
+                      if (context.eventName !== 'schedule') {
+                        core.setOutput('run', 'true');
+                        return;
+                      }
+                      const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
+                        ...context.repo,
+                        workflow_id: 'validate.yml',
+                        branch: 'main',
+                        head_sha: context.sha,
+                        status: 'success',
+                        per_page: 100,
+                      });
+                      for (const run of runs) {
+                        if (run.id === context.runId || run.head_sha !== context.sha || run.event === 'pull_request') continue;
+                        const jobs = await github.paginate(github.rest.actions.listJobsForWorkflowRun, {
+                          ...context.repo,
+                          run_id: run.id,
+                          filter: 'latest',
+                          per_page: 100,
+                        });
+                        if (jobs.some(job => job.name === 'validate' && job.status === 'completed' && job.conclusion === 'success')) {
+                          core.info(`Revision ${context.sha} passed validation in run ${run.id}.`);
+                          core.setOutput('run', 'false');
+                          return;
+                        }
+                      }
+                      core.setOutput('run', 'true');
+
     validate:
+        needs: validation-needed
+        if: needs.validation-needed.outputs.run == 'true'
         runs-on: ubuntu-latest
         timeout-minutes: 20
         steps:
