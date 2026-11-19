@@ -128,18 +128,20 @@ resource "aws_lambda_function" "data_handler" {
 
   environment {
     variables = {
-      APP_EMAIL_FROM_ADDRESS = var.email_from_address
-      APP_SUPPORT_EMAIL      = var.support_email
-      APP_LOG_LEVEL          = var.lambda_log_level
-      CLOUDFRONT_DOMAIN      = aws_cloudfront_distribution.studup.domain_name
-      PROFILE_IMAGES_BUCKET  = aws_s3_bucket.profile_images.id
-      CV_FILES_BUCKET        = aws_s3_bucket.cv_files.id
-      APP_DATABASE_USER      = "studup_app"
-      APP_DATABASE_HOST      = "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com"
-      APP_DATABASE_NAME      = "postgres"
-      APP_DATABASE_PORT      = "5432"
-      APP_DATABASE_SECRET_ID = aws_secretsmanager_secret.app_database_password.name
-      NODE_EXTRA_CA_CERTS    = "/var/task/global-bundle.pem"
+      APP_EMAIL_FROM_ADDRESS             = var.email_from_address
+      APP_SUPPORT_EMAIL                  = var.support_email
+      APP_LOG_LEVEL                      = var.lambda_log_level
+      CLOUDFRONT_DOMAIN                  = aws_cloudfront_distribution.studup.domain_name
+      PROFILE_IMAGES_BUCKET              = aws_s3_bucket.profile_images.id
+      CV_FILES_BUCKET                    = aws_s3_bucket.cv_files.id
+      APP_DATABASE_USER                  = "studup_app"
+      APP_DATABASE_HOST                  = "dev.cwkb6xgemtnz.eu-south-1.rds.amazonaws.com"
+      APP_DATABASE_NAME                  = "postgres"
+      APP_DATABASE_PORT                  = "5432"
+      APP_DATABASE_SECRET_ID             = aws_secretsmanager_secret.app_database_password.name
+      NODE_EXTRA_CA_CERTS                = "/var/task/global-bundle.pem"
+      APP_ADMIN_REASON_ENFORCEMENT       = var.admin_reason_enforcement
+      APP_ADMIN_CONFIRMATION_ENFORCEMENT = var.admin_confirmation_enforcement
     }
   }
 

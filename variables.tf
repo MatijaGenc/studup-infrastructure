@@ -83,3 +83,25 @@ variable "lambda_log_level" {
   type        = string
   default     = "info"
 }
+
+variable "admin_reason_enforcement" {
+  description = "DataHandler enforcement mode for admin action reasons (compatibility or strict)"
+  type        = string
+  default     = "compatibility"
+
+  validation {
+    condition     = contains(["compatibility", "strict"], var.admin_reason_enforcement)
+    error_message = "admin_reason_enforcement must be either \"compatibility\" or \"strict\"."
+  }
+}
+
+variable "admin_confirmation_enforcement" {
+  description = "DataHandler enforcement mode for admin confirmation proof (compatibility or strict)"
+  type        = string
+  default     = "compatibility"
+
+  validation {
+    condition     = contains(["compatibility", "strict"], var.admin_confirmation_enforcement)
+    error_message = "admin_confirmation_enforcement must be either \"compatibility\" or \"strict\"."
+  }
+}
